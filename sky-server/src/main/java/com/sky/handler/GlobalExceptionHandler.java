@@ -3,6 +3,7 @@ package com.sky.handler;
 import com.sky.exception.BaseException;
 import com.sky.result.Result;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -60,6 +61,12 @@ public class GlobalExceptionHandler {
         Class<?> requiredType = exception.getRequiredType();
         log.error("异常信息：{}", name + "类型不匹配, 期望类型为：" + requiredType);
         return Result.error(name + "类型不匹配, 期望类型为：" + requiredType);
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public Result<String> exceptionHandler(HttpRequestMethodNotSupportedException exception){
+        log.error("异常信息：{}", exception.getMessage());
+        return Result.error("错误的请求方式");
     }
 
     @ExceptionHandler({Exception.class})
