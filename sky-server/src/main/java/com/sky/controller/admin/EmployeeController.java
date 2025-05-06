@@ -10,6 +10,7 @@ import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.EmployeeService;
 import com.sky.utils.JwtUtil;
+import com.sky.valid.groups.Update;
 import com.sky.vo.EmployeeLoginVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -110,7 +111,7 @@ public class EmployeeController {
             @NotNull(message = "员工ID不能为空")
             @ApiParam(value = "员工ID", required = true)
             Long id
-    ){
+    ) {
         log.info("员工修改状态，id：{}，状态值：{}", id, status);
         employeeService.changeEmployeeStatus(status, id);
         return Result.success();
@@ -123,8 +124,17 @@ public class EmployeeController {
             @ApiParam(value = "员工ID", required = true)
             @NotNull(message = "员工ID不能为空")
             Long id
-    ){
+    ) {
+        log.info("获取员工信息，id: {}", id);
         Employee employee = employeeService.getEmployeeById(id);
         return Result.success(employee);
+    }
+
+    @PutMapping
+    @ApiOperation("更新员工信息")
+    public Result<?> updateEmployee(@RequestBody @Validated(Update.class) EmployeeDTO employeeDTO) {
+        log.info("编辑员工信息：{}", employeeDTO);
+        employeeService.updateEmployee(employeeDTO);
+        return Result.success();
     }
 }

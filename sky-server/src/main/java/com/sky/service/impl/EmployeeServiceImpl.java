@@ -120,6 +120,17 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employee;
     }
 
+    @Override
+    public void updateEmployee(EmployeeDTO employeeDTO) {
+        Employee employee = getEmployeeById(employeeDTO.getId());
+
+        BeanUtils.copyProperties(employeeDTO, employee);
+        employee.setUpdateUser(BaseContext.getCurrentId());
+        employee.setUpdateTime(LocalDateTime.now());
+
+        employeeMapper.update(employee);
+    }
+
     public static void main(String[] args) {
         String s = DigestUtils.md5DigestAsHex("123456".getBytes());
         System.out.println(s);
