@@ -18,4 +18,8 @@ public interface EmployeeService {
     boolean save(EmployeeDTO employeeDTO);
 
     PageResult<Employee> listEmployee(EmployeePageQueryDTO employeePageQueryDTO);
+
+    void changeEmployeeStatus(Integer status, Long id);
+
+
 }

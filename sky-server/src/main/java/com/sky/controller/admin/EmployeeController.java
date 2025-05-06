@@ -13,11 +13,15 @@ import com.sky.utils.JwtUtil;
 import com.sky.vo.EmployeeLoginVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,6 +32,7 @@ import java.util.Map;
 @RequestMapping("/admin/employee")
 @Slf4j
 @Api(tags = "员工相关接口")
+@Validated
 public class EmployeeController {
 
     @Autowired
@@ -79,16 +84,35 @@ public class EmployeeController {
 
     @PostMapping
     @ApiOperation("新增员工")
-    public Result<?> save(@RequestBody @Valid EmployeeDTO employeeDTO){
+    public Result<?> save(@RequestBody @Valid EmployeeDTO employeeDTO) {
         log.info("新增员工：{}", employeeDTO);
         return employeeService.save(employeeDTO) ? Result.success(null) : Result.error("添加失败");
     }
 
     @GetMapping("/page")
     @ApiOperation("获取员工列表")
-    public Result<PageResult<Employee>> listEmployee(EmployeePageQueryDTO employeePageQueryDTO){
+    public Result<PageResult<Employee>> listEmployee(EmployeePageQueryDTO employeePageQueryDTO) {
         log.info("员工分页查询，参数为：{}", employeePageQueryDTO);
         PageResult<Employee> employeePageResult = employeeService.listEmployee(employeePageQueryDTO);
         return Result.success(employeePageResult);
+    }
+
+    @PostMapping("/status/{status}")
+    @ApiOperation("修改员工状态")
+    public Result<?> changeEmployeeStatus(
+            @ApiParam(value = "员工状态", required = true)
+            @PathVariable
+            @Range(max = 1L, message = "status不合法")
+            @NotNull(message = "status不能为空")
+            Integer status,
+
+            @RequestParam
+            @NotNull(message = "员工ID不能为空")
+            @ApiParam(value = "员工ID", required = true)
+            Long id
+    ){
+        log.info("员工修改状态，id：{}，状态值：{}", id, status);
+        employeeService.changeEmployeeStatus(status, id);
+        return Result.success();
     }
 }

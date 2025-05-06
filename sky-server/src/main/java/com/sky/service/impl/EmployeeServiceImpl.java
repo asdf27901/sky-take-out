@@ -100,6 +100,20 @@ public class EmployeeServiceImpl implements EmployeeService {
         return new PageResult<>(employeePage.getTotal(), employeePage.getResult(), employeePage.getPageSize(), employeePage.getPageNum());
     }
 
+    @Override
+    public void changeEmployeeStatus(Integer status, Long id) {
+        Employee employee = employeeMapper.getById(id);
+        if (employee == null){
+            throw new BusinessException("员工id不存在");
+        }
+
+        employee.setStatus(status);
+        employee.setUpdateUser(BaseContext.getCurrentId());
+        employee.setUpdateTime(LocalDateTime.now());
+
+        employeeMapper.update(employee);
+    }
+
     public static void main(String[] args) {
         String s = DigestUtils.md5DigestAsHex("123456".getBytes());
         System.out.println(s);
