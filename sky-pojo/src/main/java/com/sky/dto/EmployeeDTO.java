@@ -1,19 +1,22 @@
 package com.sky.dto;
 
+import com.sky.valid.groups.Update;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 @Data
-@ApiModel("新增员工模型")
+@ApiModel("员工模型")
 public class EmployeeDTO implements Serializable {
 
     @ApiModelProperty(value = "ID", required = false)
+    @NotNull(groups = Update.class, message = "员工ID不能为空")
     private Long id;
 
     @ApiModelProperty(value = "登录账号", required = true)
