@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -79,7 +80,7 @@ public class EmployeeController {
 
     @PostMapping
     @ApiOperation("新增员工")
-    public Result<?> save(@RequestBody EmployeeDTO employeeDTO){
+    public Result<?> save(@RequestBody @Valid EmployeeDTO employeeDTO){
         log.info("新增员工：{}", employeeDTO);
         return employeeService.save(employeeDTO) ? Result.success(null) : Result.error("添加失败");
     }
