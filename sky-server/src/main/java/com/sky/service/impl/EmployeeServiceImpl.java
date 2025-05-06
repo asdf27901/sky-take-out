@@ -1,18 +1,23 @@
 package com.sky.service.impl;
 
 import com.sky.constant.MessageConstant;
+import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
+import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.entity.Employee;
 import com.sky.exception.AccountLockedException;
 import com.sky.exception.AccountNotFoundException;
+import com.sky.exception.BusinessException;
 import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
 import com.sky.service.EmployeeService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Service
@@ -53,6 +58,33 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         //3、返回实体对象
         return employee;
+    }
+
+    @Override
+    public boolean save(EmployeeDTO employeeDTO) {
+
+        // 寻找当前的要添加的用户名是否已被占用
+        Employee em = employeeMapper.getByUsername(employeeDTO.getUsername());
+        if (em != null){
+            throw new BusinessException(employeeDTO.getUsername() + "用户名已被注册");
+        }
+
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO, employee);
+
+        LocalDateTime now = LocalDateTime.now();
+
+        employee.setCreateTime(now);
+        employee.setUpdateTime(now);
+
+        // 设置默认密码
+        employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
+        // 数据库status默认状态为1
+
+        // TODO:后面需要用threadLocal获取当前登录用户
+        employee.setCreateUser(10L);
+        employee.setUpdateUser(10L);
+        return employeeMapper.insertEmployee(employee) > 0;
     }
 
     public static void main(String[] args) {
