@@ -102,16 +102,22 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public void changeEmployeeStatus(Integer status, Long id) {
-        Employee employee = employeeMapper.getById(id);
-        if (employee == null){
-            throw new BusinessException("员工id不存在");
-        }
+        Employee employee = getEmployeeById(id);
 
         employee.setStatus(status);
         employee.setUpdateUser(BaseContext.getCurrentId());
         employee.setUpdateTime(LocalDateTime.now());
 
         employeeMapper.update(employee);
+    }
+
+    @Override
+    public Employee getEmployeeById(Long id) {
+        Employee employee = employeeMapper.getById(id);
+        if (employee == null){
+            throw new BusinessException("员工id不存在");
+        }
+        return employee;
     }
 
     public static void main(String[] args) {

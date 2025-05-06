@@ -115,4 +115,16 @@ public class EmployeeController {
         employeeService.changeEmployeeStatus(status, id);
         return Result.success();
     }
+
+    @GetMapping("/{id}")
+    @ApiOperation("根据ID查询员工信息")
+    public Result<Employee> getEmployeeById(
+            @PathVariable
+            @ApiParam(value = "员工ID", required = true)
+            @NotNull(message = "员工ID不能为空")
+            Long id
+    ){
+        Employee employee = employeeService.getEmployeeById(id);
+        return Result.success(employee);
+    }
 }
