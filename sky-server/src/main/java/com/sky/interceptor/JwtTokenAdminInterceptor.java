@@ -1,9 +1,11 @@
 package com.sky.interceptor;
 
 import com.sky.constant.JwtClaimsConstant;
+import com.sky.context.BaseContext;
+import com.sky.exception.BusinessException;
 import com.sky.properties.JwtProperties;
 import com.sky.utils.JwtUtil;
-import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -46,13 +48,20 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
             log.info("jwt校验:{}", token);
             Claims claims = JwtUtil.parseJWT(jwtProperties.getAdminSecretKey(), token);
             Long empId = Long.valueOf(claims.get(JwtClaimsConstant.EMP_ID).toString());
+            BaseContext.setCurrentId(empId);  // 保存当前登录的员工id到threadLocal中
             log.info("当前员工id：{}", empId);
             //3、通过，放行
             return true;
-        } catch (Exception ex) {
-            //4、不通过，响应401状态码
-            response.setStatus(401);
-            return false;
+        } catch (ExpiredJwtException e) {
+            throw new BusinessException("token已过期");
+        } catch (Exception e){
+            throw new BusinessException("token不合法");
         }
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        log.info("清除线程: " + Thread.currentThread().getId() + "中的threadLocal变量");
+        BaseContext.removeCurrentId(); // 清除避免内存溢出
     }
 }
