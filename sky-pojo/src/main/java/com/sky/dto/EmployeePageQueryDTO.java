@@ -16,10 +16,10 @@ public class EmployeePageQueryDTO implements Serializable {
 
     //页码
     @ApiModelProperty("页码")
-    private int page;
+    private int page = 1;
 
     //每页显示记录数
     @ApiModelProperty("每页数量")
-    private int pageSize;
+    private int pageSize = 10;
 
 }
