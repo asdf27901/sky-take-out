@@ -49,7 +49,7 @@ public class EmployeeController {
      */
     @PostMapping("/login")
     @ApiOperation("员工登录")
-    public Result<EmployeeLoginVO> login(@RequestBody EmployeeLoginDTO employeeLoginDTO) {
+    public Result<EmployeeLoginVO> login(@RequestBody @Valid EmployeeLoginDTO employeeLoginDTO) {
         log.info("员工登录：{}", employeeLoginDTO);
 
         Employee employee = employeeService.login(employeeLoginDTO);
