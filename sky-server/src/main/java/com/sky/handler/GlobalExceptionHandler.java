@@ -1,8 +1,11 @@
 package com.sky.handler;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.sky.exception.BaseException;
 import com.sky.result.Result;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -77,6 +80,23 @@ public class GlobalExceptionHandler {
             String errorMessage = String.format("字段 '%s' 校验失败：%s", fieldName, validationMessage);
             log.error("异常信息：校验异常：{}", errorMessage);
             return Result.error(errorMessage);
+        }
+    }
+
+    // 当使用@RequestBody接收参数时，当出现HttpMessageNotReadableException就是类型转换失败
+    // 需要区分出是类型转换的异常还是json本身格式有问题
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public Result<String> exceptionHandler(HttpMessageNotReadableException exception) {
+        Throwable throwable = exception.getCause(); // 获取异常根本原因
+        if (throwable instanceof InvalidFormatException) {
+            log.error("类型转换异常", exception);
+            return Result.error("类型转换异常，请检查");
+        } else if (throwable instanceof JsonParseException) {
+            log.error("无效的json格式", exception);
+            return Result.error("无效的json格式，请检查");
+        } else {
+            log.error("请求体解析错误", exception);
+            return Result.error("请求体解析错误");
         }
     }
 
