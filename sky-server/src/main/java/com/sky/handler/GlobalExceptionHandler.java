@@ -89,8 +89,10 @@ public class GlobalExceptionHandler {
     public Result<String> exceptionHandler(HttpMessageNotReadableException exception) {
         Throwable throwable = exception.getCause(); // 获取异常根本原因
         if (throwable instanceof InvalidFormatException) {
-            log.error("类型转换异常", exception);
-            return Result.error("类型转换异常，请检查");
+            InvalidFormatException e = (InvalidFormatException) throwable;
+            log.error("类型转换异常", e);
+            String simpleName = e.getTargetType().getSimpleName();
+            return Result.error("类型异常，期望类型为：" + simpleName + "，输入值：[" + e.getValue() + "]");
         } else if (throwable instanceof JsonParseException) {
             log.error("无效的json格式", exception);
             return Result.error("无效的json格式，请检查");
