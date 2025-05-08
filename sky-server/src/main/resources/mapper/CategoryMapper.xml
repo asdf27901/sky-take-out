@@ -7,7 +7,6 @@
         <set>
             update_user = #{updateUser},
             update_time = #{updateTime},
-            <if test="type != null">type = #{type},</if>
             <if test="name != null">name = #{name},</if>
             <if test="sort != null">sort = #{sort},</if>
             <if test="status != null">status = #{status}</if>

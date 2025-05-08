@@ -6,6 +6,8 @@ import com.sky.entity.Category;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.CategoryService;
+import com.sky.valid.groups.Add;
+import com.sky.valid.groups.Update;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -38,7 +40,7 @@ public class CategoryController {
 
     @PostMapping
     @ApiOperation("新增分类")
-    public Result<?> addCategory(@RequestBody @Valid CategoryDTO categoryDTO) {
+    public Result<?> addCategory(@RequestBody @Validated(Add.class) CategoryDTO categoryDTO) {
         log.info("新增分类，参数为：{}", categoryDTO);
         boolean result = categoryService.addCategory(categoryDTO);
         return result ? Result.success() : Result.error("新增失败");
@@ -46,7 +48,7 @@ public class CategoryController {
 
     @PutMapping
     @ApiOperation("修改分类")
-    public Result<?> updateCategory(@RequestBody @Valid CategoryDTO categoryDTO) {
+    public Result<?> updateCategory(@RequestBody @Validated(Update.class) CategoryDTO categoryDTO) {
         log.info("修改分类，参数为：{}", categoryDTO);
         boolean result = categoryService.updateCategory(categoryDTO);
         return result ? Result.success() : Result.error("更新失败");
