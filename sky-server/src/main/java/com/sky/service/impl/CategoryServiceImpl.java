@@ -8,7 +8,10 @@ import com.sky.dto.CategoryDTO;
 import com.sky.dto.CategoryPageQueryDTO;
 import com.sky.entity.Category;
 import com.sky.exception.BusinessException;
+import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.CategoryMapper;
+import com.sky.mapper.DishMapper;
+import com.sky.mapper.SetMealMapper;
 import com.sky.result.PageResult;
 import com.sky.service.CategoryService;
 import org.springframework.beans.BeanUtils;
@@ -23,6 +26,12 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
     private CategoryMapper categoryMapper;
+
+    @Autowired
+    private DishMapper dishMapper;
+
+    @Autowired
+    private SetMealMapper setMealMapper;
 
     @Override
     public Category getCategoryById(Long id) {
@@ -99,6 +108,13 @@ public class CategoryServiceImpl implements CategoryService {
         //查找id是否存在
         Category category = getCategoryById(id);
         if (category == null) throw new BusinessException("分类ID不存在");
+
+        //查询分类下是否存在菜品
+        int dishCount = dishMapper.getCountByCategoryId(id);
+        int setMealCount = setMealMapper.getCountByCategoryId(id);
+        if (dishCount > 0 || setMealCount > 0) {
+            throw new DeletionNotAllowedException("删除失败，当前分类下存在套餐或菜品，请检查");
+        }
 
         int affectRow = categoryMapper.delCategoryById(id);
         return affectRow > 0;
