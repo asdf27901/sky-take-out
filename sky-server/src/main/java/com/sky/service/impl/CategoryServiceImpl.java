@@ -95,6 +95,13 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = getCategoryById(categoryDTO.getId());
         if (category == null) throw new BusinessException("分类ID不存在");
 
+        // 检查dto中的分类名称和数据库中查出来的分类名称是否一致
+        // 如果一致就不需要处理，不一致则需要查询是否已经使用过
+        if (!categoryDTO.getName().equals(category.getName())) {
+            int count = getCategoryByName(categoryDTO.getName());
+            if (count > 0) throw new BusinessException("分类名称已存在，请重新输入");
+        }
+
         BeanUtils.copyProperties(categoryDTO, category);
         category.setUpdateUser(BaseContext.getCurrentId());
         category.setUpdateTime(LocalDateTime.now());
