@@ -79,7 +79,7 @@ public class GlobalExceptionHandler {
             String validationMessage = fieldError.getDefaultMessage();
             String errorMessage = String.format("字段 '%s' 校验失败：%s", fieldName, validationMessage);
             log.error("异常信息：校验异常：{}", errorMessage);
-            return Result.error(errorMessage);
+            return Result.error(validationMessage);
         }
     }
 
