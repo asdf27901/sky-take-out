@@ -5,6 +5,7 @@ import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.OSSException;
 import com.aliyun.oss.model.ObjectMetadata;
+import com.sky.exception.BusinessException;
 import com.sky.properties.AliOssProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -29,7 +31,6 @@ public class AliOssUtil {
     @Autowired
     private AliOssProperties aliOssProperties;
 
-    @SneakyThrows
     public String upload(MultipartFile file) {
 
         String originalFileName = file.getOriginalFilename();
@@ -45,23 +46,27 @@ public class AliOssUtil {
         try {
             // 创建PutObject请求。
             ossClient.putObject(aliOssProperties.getBucketName(), fileName, new ByteArrayInputStream(file.getBytes()), objectMetadata);
-        } catch (OSSException oe) {
-            System.out.println("Caught an OSSException, which means your request made it to OSS, "
-                    + "but was rejected with an error response for some reason.");
-            System.out.println("Error Message:" + oe.getErrorMessage());
-            System.out.println("Error Code:" + oe.getErrorCode());
-            System.out.println("Request ID:" + oe.getRequestId());
-            System.out.println("Host ID:" + oe.getHostId());
-        } catch (ClientException ce) {
-            System.out.println("Caught an ClientException, which means the client encountered "
-                    + "a serious internal problem while trying to communicate with OSS, "
-                    + "such as not being able to access the network.");
-            System.out.println("Error Message:" + ce.getMessage());
-        } finally {
-            if (ossClient != null) {
-                ossClient.shutdown();
-            }
+        } catch (Exception e) {
+            log.error("文件上传失败：", e);
+            throw new BusinessException("文件上传失败");
         }
+//        } catch (OSSException oe) {
+//            System.out.println("Caught an OSSException, which means your request made it to OSS, "
+//                    + "but was rejected with an error response for some reason.");
+//            System.out.println("Error Message:" + oe.getErrorMessage());
+//            System.out.println("Error Code:" + oe.getErrorCode());
+//            System.out.println("Request ID:" + oe.getRequestId());
+//            System.out.println("Host ID:" + oe.getHostId());
+//        } catch (ClientException ce) {
+//            System.out.println("Caught an ClientException, which means the client encountered "
+//                    + "a serious internal problem while trying to communicate with OSS, "
+//                    + "such as not being able to access the network.");
+//            System.out.println("Error Message:" + ce.getMessage());
+//        } finally {
+//            if (ossClient != null) {
+//                ossClient.shutdown();
+//            }
+//        }
 
         //文件访问路径规则 https://BucketName.Endpoint/ObjectName
         StringBuilder stringBuilder = new StringBuilder("https://");
@@ -72,7 +77,7 @@ public class AliOssUtil {
                 .append("/")
                 .append(fileName);
 
-        log.info("文件上传到:{}", stringBuilder);
+        log.info("文件上传到: {}", stringBuilder);
 
         return stringBuilder.toString();
     }
