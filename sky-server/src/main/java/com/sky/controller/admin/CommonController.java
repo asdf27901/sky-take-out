@@ -28,7 +28,7 @@ public class CommonController {
     @ApiOperation("文件上传接口")
     public Result<String> uploadFile(
             @ApiParam("需要上传的文件")
-            @File(maxSize = 5, allowFileTypes = "jpg")
+            @File(maxSize = 5, allowFileTypes = {"jpg", "jpeg", "png", "gif"})
             MultipartFile file
     ) {
         String path = aliOssUtil.upload(file);
