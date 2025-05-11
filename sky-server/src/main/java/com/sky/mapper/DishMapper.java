@@ -32,4 +32,12 @@ public interface DishMapper {
     Long[] getSellingDishListByIds(Long[] ids);
 
     int deleteByIds(Long[] ids);
+
+    DishVO getDishVOById(Long id);
+
+    @Select("select * from dish where id = #{id}")
+    Dish getDishById(Long id);
+
+    @AutoSet(OperationType.UPDATE)
+    int updateDish(Dish dish);
 }

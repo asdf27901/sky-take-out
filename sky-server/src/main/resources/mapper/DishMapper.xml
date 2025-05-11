@@ -10,7 +10,7 @@
             <result column="dish_flavor_name" property="name"/>
         </collection>
     </resultMap>
-    
+
     <select id="getDishVoList" resultMap="DishVOMap">
         select d.id,
                d.name,
@@ -60,4 +60,39 @@
             #{id}
         </foreach>
     </delete>
+
+
+    <select id="getDishVOById" resultMap="DishVOMap">
+        select d.id,
+               d.name,
+               d.category_id,
+               d.price,
+               d.image,
+               d.description,
+               d.status,
+               d.update_time,
+               c.name as category_name,
+               df.id as dish_flavor_id,
+               df.dish_id,
+               df.name as dish_flavor_name,
+               df.value
+        from dish d
+                 join category c on d.category_id = c.id
+                 left join dish_flavor df on d.id = df.dish_id
+        where d.id = #{id}
+    </select>
+
+
+    <update id="updateDish">
+        update dish
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="image != null">image = #{image},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="status != null">status = #{status},</if>
+        </set>
+        where id = #{id}
+    </update>
 </mapper>

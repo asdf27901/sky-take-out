@@ -6,11 +6,13 @@ import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.DishService;
 import com.sky.valid.groups.Add;
+import com.sky.valid.groups.Update;
 import com.sky.vo.DishVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -54,5 +56,38 @@ public class DishController {
         log.info("删除菜品：{}", Arrays.toString(ids));
         boolean result = dishService.deleteDishByIds(ids);
         return result ? Result.success() : Result.error("删除失败");
+    }
+
+    @ApiOperation("根据ID查询菜品")
+    @GetMapping("{id}")
+    public Result<DishVO> getDishVOById(@PathVariable Long id) {
+        log.info("查询菜品：{}", id);
+        DishVO dishVO = dishService.getDishVOById(id);
+        return Result.success(dishVO);
+    }
+
+    @ApiOperation("修改菜品")
+    @PutMapping
+    public Result<?> updateDish(@RequestBody @Validated(Update.class) DishDTO dishDTO) {
+        log.info("更新菜品：{}", dishDTO);
+        boolean result = dishService.updateDish(dishDTO);
+        return result ? Result.success() : Result.error("更新失败");
+    }
+
+    @ApiOperation("菜品起售、停售")
+    @PostMapping("/status/{status}")
+    public Result<?> updateDishStatus(
+            @PathVariable
+            @Range(max = 1L, message = "菜品状态不合法")
+            @ApiParam(value = "菜品状态", allowableValues = "0, 1", required = true)
+            Integer status,
+
+            @ApiParam(value = "菜品ID", required = true)
+            @RequestParam
+            Long id
+    ) {
+        log.info("修改菜品状态：id: {}, status: {}", id, status);
+        boolean result = dishService.updateDishStatus(id, status);
+        return result ? Result.success() : Result.error("更新失败");
     }
 }

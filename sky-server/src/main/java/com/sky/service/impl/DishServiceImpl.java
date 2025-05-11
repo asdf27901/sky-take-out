@@ -99,4 +99,45 @@ public class DishServiceImpl implements DishService {
 
         return affectRows >= 0;
     }
+
+    @Override
+    public DishVO getDishVOById(Long id) {
+        DishVO dishVO = dishMapper.getDishVOById(id);
+        if (dishVO == null) {
+            throw new BusinessException("菜品ID不存在");
+        }
+        return dishVO;
+    }
+
+    @Override
+    @Transactional
+    public boolean updateDish(DishDTO dishDTO) {
+        Dish dish = dishMapper.getDishById(dishDTO.getId());
+        if (dish == null) {
+            throw new BusinessException("菜品ID不存在");
+        }
+
+        BeanUtils.copyProperties(dishDTO, dish);
+        // 更新菜品
+        int affectRow = dishMapper.updateDish(dish);
+
+        // 更新口味数据
+        List<DishFlavor> dishFlavors = dishDTO.getFlavors();
+       // 先删除原有的数据，然后再插入
+        dishFlavorMapper.deleteByDishIds(new Long[]{dishDTO.getId()});
+        dishFlavorMapper.saveBatch(dishFlavors);
+
+        return affectRow > 0;
+    }
+
+    @Override
+    public boolean updateDishStatus(Long id, Integer status) {
+        Dish dish = dishMapper.getDishById(id);
+        if (dish == null) {
+            throw new BusinessException("菜品ID不存在");
+        }
+        dish.setStatus(status);
+        int affectRow = dishMapper.updateDish(dish);
+        return affectRow > 0;
+    }
 }

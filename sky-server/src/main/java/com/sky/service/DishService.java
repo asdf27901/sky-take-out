@@ -11,4 +11,10 @@ public interface DishService {
     boolean saveDish(DishDTO dishDTO);
 
     boolean deleteDishByIds(Long[] ids);
+
+    DishVO getDishVOById(Long id);
+
+    boolean updateDish(DishDTO dishDTO);
+
+    boolean updateDishStatus(Long id, Integer status);
 }
