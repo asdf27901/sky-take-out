@@ -21,6 +21,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
 @Service
 public class DishServiceImpl implements DishService {
@@ -127,6 +128,7 @@ public class DishServiceImpl implements DishService {
         dishFlavorMapper.deleteByDishIds(new Long[]{dishDTO.getId()});
         // 当dishFlavors非空时才进行插入
         if (!CollectionUtils.isEmpty(dishFlavors)) {
+            dishFlavors.forEach(dishFlavor -> dishFlavor.setDishId(dishDTO.getId()));
             dishFlavorMapper.saveBatch(dishFlavors);
         }
         return affectRow > 0;

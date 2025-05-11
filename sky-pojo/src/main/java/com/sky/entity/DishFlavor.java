@@ -29,7 +29,6 @@ public class DishFlavor implements Serializable {
 
     //菜品id
     @ApiModelProperty("菜品ID")
-    @NotNull(groups = Update.class, message = "菜品ID不能为空")
     private Long dishId;
 
     //口味名称
