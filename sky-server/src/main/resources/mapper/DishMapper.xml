@@ -86,6 +86,8 @@
     <update id="updateDish">
         update dish
         <set>
+            update_time = #{updateTime},
+            update_user = #{updateUser},
             <if test="name != null">name = #{name},</if>
             <if test="categoryId != null">category_id = #{categoryId},</if>
             <if test="price != null">price = #{price},</if>
