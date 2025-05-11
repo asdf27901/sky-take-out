@@ -37,7 +37,7 @@ public class AutoSetAspect {
             LocalDateTime now = LocalDateTime.now();
             Long empId = BaseContext.getCurrentId();
 
-            Method setCreateTimeMethod = o.getClass().getDeclaredMethod(AutoSetConstant.SET_UPDATE_TIME, LocalDateTime.class);
+            Method setCreateTimeMethod = o.getClass().getDeclaredMethod(AutoSetConstant.SET_CREATE_TIME, LocalDateTime.class);
             Method setUpdateTimeMethod = o.getClass().getDeclaredMethod(AutoSetConstant.SET_UPDATE_TIME, LocalDateTime.class);
             Method setCreateUserMethod = o.getClass().getDeclaredMethod(AutoSetConstant.SET_CREATE_USER, Long.class);
             Method setUpdateUserMethod = o.getClass().getDeclaredMethod(AutoSetConstant.SET_UPDATE_USER, Long.class);
@@ -45,8 +45,6 @@ public class AutoSetAspect {
             if (Objects.requireNonNull(operationType) == OperationType.INSERT) {
                 setCreateTimeMethod.invoke(o, now);
                 setCreateUserMethod.invoke(o, empId);
-                setUpdateTimeMethod.invoke(o, now);
-                setUpdateUserMethod.invoke(o, empId);
             }
             setUpdateTimeMethod.invoke(o, now);
             setUpdateUserMethod.invoke(o, empId);
