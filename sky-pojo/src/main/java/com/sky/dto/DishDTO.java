@@ -8,6 +8,7 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -24,7 +25,7 @@ public class DishDTO implements Serializable {
 
     //菜品名称
     @ApiModelProperty("菜品名称")
-    @NotNull(message = "菜品名称不能为空")
+    @NotBlank(message = "菜品名称不能为空")
     private String name;
 
     //菜品分类id
@@ -40,7 +41,7 @@ public class DishDTO implements Serializable {
 
     //图片
     @ApiModelProperty("菜品图片")
-    @NotNull(message = "菜品图片不能为空")
+    @NotBlank(message = "菜品图片不能为空")
     private String image;
 
     //描述信息
