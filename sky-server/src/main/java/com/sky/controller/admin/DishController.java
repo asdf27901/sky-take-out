@@ -2,11 +2,11 @@ package com.sky.controller.admin;
 
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
-import com.sky.entity.Dish;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.DishService;
 import com.sky.valid.groups.Add;
+import com.sky.vo.DishVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -29,13 +29,14 @@ public class DishController {
     @ApiOperation("新增菜品")
     @PostMapping
     public Result<?> saveDish(@RequestBody @Validated(Add.class) DishDTO dishDTO) {
-        return null;
+        boolean result = dishService.saveDish(dishDTO);
+        return result ? Result.success() : Result.error("添加菜品失败");
     }
 
     @ApiOperation("分页查询菜品列表")
     @GetMapping("/page")
-    public Result<PageResult<Dish>> getDishList(@Valid DishPageQueryDTO dishPageQueryDTO) {
-        PageResult<Dish> dishPageResult = dishService.getDishList(dishPageQueryDTO);
-        return Result.success(dishPageResult);
+    public Result<PageResult<DishVO>> getDishList(@Valid DishPageQueryDTO dishPageQueryDTO) {
+        PageResult<DishVO> dishVOPageResult = dishService.getDishList(dishPageQueryDTO);
+        return Result.success(dishVOPageResult);
     }
 }

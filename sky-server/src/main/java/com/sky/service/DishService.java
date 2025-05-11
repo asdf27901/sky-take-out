@@ -1,9 +1,12 @@
 package com.sky.service;
 
+import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
-import com.sky.entity.Dish;
 import com.sky.result.PageResult;
+import com.sky.vo.DishVO;
 
 public interface DishService {
-    PageResult<Dish> getDishList(DishPageQueryDTO dishPageQueryDTO);
+    PageResult<DishVO> getDishList(DishPageQueryDTO dishPageQueryDTO);
+
+    boolean saveDish(DishDTO dishDTO);
 }
