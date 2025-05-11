@@ -125,8 +125,10 @@ public class DishServiceImpl implements DishService {
         List<DishFlavor> dishFlavors = dishDTO.getFlavors();
        // 先删除原有的数据，然后再插入
         dishFlavorMapper.deleteByDishIds(new Long[]{dishDTO.getId()});
-        dishFlavorMapper.saveBatch(dishFlavors);
-
+        // 当dishFlavors非空时才进行插入
+        if (!CollectionUtils.isEmpty(dishFlavors)) {
+            dishFlavorMapper.saveBatch(dishFlavors);
+        }
         return affectRow > 0;
     }
 
