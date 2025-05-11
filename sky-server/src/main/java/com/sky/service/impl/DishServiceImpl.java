@@ -8,9 +8,8 @@ import com.sky.entity.Category;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
 import com.sky.exception.BusinessException;
-import com.sky.mapper.CategoryMapper;
-import com.sky.mapper.DishFlavorMapper;
-import com.sky.mapper.DishMapper;
+import com.sky.exception.DeletionNotAllowedException;
+import com.sky.mapper.*;
 import com.sky.result.PageResult;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
@@ -20,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -33,6 +33,9 @@ public class DishServiceImpl implements DishService {
 
     @Autowired
     private DishFlavorMapper dishFlavorMapper;
+
+    @Autowired
+    private SetMealDishMapper setMealDishMapper;
 
     @Override
     public PageResult<DishVO> getDishList(DishPageQueryDTO dishPageQueryDTO) {
@@ -71,5 +74,29 @@ public class DishServiceImpl implements DishService {
         }
 
         return affectRow > 0 && affectRows >= 0;
+    }
+
+    @Override
+    @Transactional
+    public boolean deleteDishByIds(Long[] ids) {
+        // 查找需要被删除的菜品ID是否是起售中
+        Long[] sellingDishIds = dishMapper.getSellingDishListByIds(ids);
+        if (sellingDishIds.length != 0) {
+            throw new DeletionNotAllowedException("删除失败，菜品ID为：" + Arrays.toString(sellingDishIds) + " 状态为起售中");
+        }
+        // 查找菜品ID是否存在关联的套餐
+        Long[] setMealWithDish = setMealDishMapper.getCountByDishIds(ids);
+        if (setMealWithDish.length != 0) {
+            throw new DeletionNotAllowedException("删除失败，菜品ID为：" + Arrays.toString(setMealWithDish) + " 存在关联套餐");
+        }
+        // 删除菜品
+        int affectRows = dishMapper.deleteByIds(ids);
+
+        // 删除菜品对应的口味数据
+        affectRows *= dishFlavorMapper.deleteByDishIds(ids);
+
+        // TODO：删除阿里云oss对应文件
+
+        return affectRows >= 0;
     }
 }

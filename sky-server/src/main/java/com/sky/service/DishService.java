@@ -9,4 +9,6 @@ public interface DishService {
     PageResult<DishVO> getDishList(DishPageQueryDTO dishPageQueryDTO);
 
     boolean saveDish(DishDTO dishDTO);
+
+    boolean deleteDishByIds(Long[] ids);
 }

@@ -9,4 +9,6 @@ import java.util.List;
 public interface DishFlavorMapper {
 
     int saveBatch(List<DishFlavor> dishFlavors);
+
+    int deleteByDishIds(Long[] ids);
 }

@@ -30,7 +30,7 @@
                  left join dish_flavor df on d.id = df.dish_id
         <where>
             <if test="name != null and name != ''">
-                and d.name = #{name}
+                and d.name like concat('%', #{name}, '%')
             </if>
             <if test="categoryId != null">
                 and d.category_id = #{categoryId}
@@ -41,4 +41,23 @@
         </where>
         order by d.id
     </select>
+    <select id="getSellingDishListByIds" resultType="java.lang.Long">
+        select
+            id
+        from dish
+        where status = 1
+        and id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+    <delete id="deleteByIds">
+        delete
+        from dish
+        where id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
 </mapper>
