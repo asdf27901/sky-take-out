@@ -56,12 +56,12 @@ public class SetMealServiceImpl implements SetMealService {
         List<Long> sellingDishListByIds = dishMapper.getSellingDishListByIds(new ArrayList<>(dishIds));
         if (sellingDishListByIds.size() != dishIds.size()) {
             List<Long> missingDishIds = new ArrayList<>();
-            for (Long dishId : sellingDishListByIds) {
-                if (!dishIds.contains(dishId)) {
+            for (Long dishId : dishIds) {
+                if (!sellingDishListByIds.contains(dishId)) {
                     missingDishIds.add(dishId);
                 }
             }
-            throw new BusinessException("菜品ID: [" + missingDishIds + "] 已停售或者不存在");
+            throw new BusinessException("菜品ID: " + missingDishIds + " 已停售或者不存在");
         }
 
         Setmeal setmeal = new Setmeal();
