@@ -117,13 +117,20 @@ public class DishServiceImpl implements DishService {
             throw new BusinessException("菜品ID不存在");
         }
 
+        // 当数据库中得到的菜品名称和传入的菜品名称不同时，需要判断菜品名称是否重复
+        if (!dishDTO.getName().equals(dish.getName())) {
+            if (dishMapper.getDishByDishName(dishDTO.getName()) != null) {
+                throw new BusinessException("菜品名称重复");
+            }
+        }
+
         BeanUtils.copyProperties(dishDTO, dish);
         // 更新菜品
         int affectRow = dishMapper.updateDish(dish);
 
         // 更新口味数据
         List<DishFlavor> dishFlavors = dishDTO.getFlavors();
-       // 先删除原有的数据，然后再插入
+        // 先删除原有的数据，然后再插入
         dishFlavorMapper.deleteByDishIds(new Long[]{dishDTO.getId()});
         // 当dishFlavors非空时才进行插入
         if (!CollectionUtils.isEmpty(dishFlavors)) {
