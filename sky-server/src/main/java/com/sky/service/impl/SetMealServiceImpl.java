@@ -138,15 +138,17 @@ public class SetMealServiceImpl implements SetMealService {
         // 查找处于非起售状态的套餐
         List<Long> sellingSetMealIds = setMealMapper.getSellingSetMealByIds(ids);
         List<Long> notSellingSetMealIds = ids.stream().filter(aLong -> !sellingSetMealIds.contains(aLong)).collect(Collectors.toList());
+
+        int affectRows = 0;
         if (!CollectionUtils.isEmpty(notSellingSetMealIds)) {
             // 删除套餐
-            setMealMapper.deleteSetMealByIds(ids);
+            affectRows += setMealMapper.deleteSetMealByIds(ids);
 
             // TODO: 需要删除阿里云图片
             // 删除套餐关联菜品
             setMealDishMapper.delSetMealDishByIds(ids);
         }
-        return true;
+        return affectRows > 0;
     }
 
     private void checkDishExistAndSelling(List<SetmealDish> setmealDishes) {
