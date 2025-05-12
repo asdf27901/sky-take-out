@@ -13,7 +13,7 @@
         group by dish_id
     </select>
 
-    <insert id="saveSetmealDish">
+    <insert id="saveSetmealDishBatch">
         insert into setmeal_dish (setmeal_id, dish_id, name, price, copies)
         values
             <foreach collection="setmealDishes" item="setMealDish" separator=",">
