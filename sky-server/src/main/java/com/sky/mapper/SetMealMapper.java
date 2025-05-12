@@ -30,4 +30,7 @@ public interface SetMealMapper {
     Page<SetmealVO> listAllSetMeal(SetmealPageQueryDTO setmealPageQueryDTO);
 
     SetmealVO getSetMealById(Long id);
+
+    @AutoSet(OperationType.UPDATE)
+    int updateSetMeal(Setmeal setmeal);
 }

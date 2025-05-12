@@ -57,17 +57,7 @@ public class SetMealServiceImpl implements SetMealService {
 
         // 查找套餐下的菜品ID是否存在，并且要求是起售中
         List<SetmealDish> setmealDishes = setmealDTO.getSetmealDishes();
-        Set<Long> dishIds = setmealDishes.stream().map(SetmealDish::getDishId).collect(Collectors.toSet());
-        List<Long> sellingDishListByIds = dishMapper.getSellingDishListByIds(new ArrayList<>(dishIds));
-        if (sellingDishListByIds.size() != dishIds.size()) {
-            List<Long> missingDishIds = new ArrayList<>();
-            for (Long dishId : dishIds) {
-                if (!sellingDishListByIds.contains(dishId)) {
-                    missingDishIds.add(dishId);
-                }
-            }
-            throw new BusinessException("菜品ID: " + missingDishIds + " 已停售或者不存在");
-        }
+        checkDishExistAndSelling(setmealDishes);
 
         Setmeal setmeal = new Setmeal();
         BeanUtils.copyProperties(setmealDTO, setmeal);
@@ -95,5 +85,50 @@ public class SetMealServiceImpl implements SetMealService {
             throw new BusinessException("套餐ID不存在");
         }
         return setmealVO;
+    }
+
+    @Override
+    @Transactional
+    public boolean updateSetMeal(SetmealDTO setmealDTO) {
+        SetmealVO setmealVO = setMealMapper.getSetMealById(setmealDTO.getId());
+        if (setmealVO == null) {
+            throw new BusinessException("套餐ID不存在");
+        }
+        if (!setmealDTO.getName().equals(setmealVO.getName())) {
+            int count = setMealMapper.getByMealName(setmealDTO.getName());
+            if (count != 0) {
+                throw new BusinessException("套餐名称重复");
+            }
+        }
+
+        // TODO: 更新图片需要把原来的图片删了
+        Setmeal setmeal = new Setmeal();
+        BeanUtils.copyProperties(setmealDTO, setmeal);
+        int affectRow = setMealMapper.updateSetMeal(setmeal);
+
+        // 更新套餐菜品关系
+        // 删除原来的套餐菜品
+        setMealDishMapper.delSetMealDishById(setmealDTO.getId());
+        // 新增套餐菜品, 菜品列表不可能为空
+        // 查找套餐下的菜品ID是否存在，并且要求是起售中
+        List<SetmealDish> setmealDishes = setmealDTO.getSetmealDishes();
+        checkDishExistAndSelling(setmealDishes);
+        setMealDishMapper.saveSetmealDishBatch(setmealDishes);
+
+        return affectRow > 0;
+    }
+
+    private void checkDishExistAndSelling(List<SetmealDish> setmealDishes) {
+        Set<Long> dishIds = setmealDishes.stream().map(SetmealDish::getDishId).collect(Collectors.toSet());
+        List<Long> sellingDishListByIds = dishMapper.getSellingDishListByIds(new ArrayList<>(dishIds));
+        if (sellingDishListByIds.size() != dishIds.size()) {
+            List<Long> missingDishIds = new ArrayList<>();
+            for (Long dishId : dishIds) {
+                if (!sellingDishListByIds.contains(dishId)) {
+                    missingDishIds.add(dishId);
+                }
+            }
+            throw new BusinessException("菜品ID: " + missingDishIds + " 已停售或者不存在");
+        }
     }
 }

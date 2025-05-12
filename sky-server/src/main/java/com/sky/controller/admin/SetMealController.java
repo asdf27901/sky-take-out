@@ -6,6 +6,7 @@ import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.SetMealService;
 import com.sky.valid.groups.Add;
+import com.sky.valid.groups.Update;
 import com.sky.vo.SetmealVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -46,5 +47,13 @@ public class SetMealController {
         log.info("根据ID查询套餐：{}", id);
         SetmealVO setmealVO = setMealService.getSetMealById(id);
         return Result.success(setmealVO);
+    }
+
+    @ApiOperation("修改套餐")
+    @PutMapping
+    public Result<?> updateSetMeal(@RequestBody @Validated(Update.class) SetmealDTO setmealDTO) {
+        log.info("更新套餐: {}", setmealDTO);
+        boolean result = setMealService.updateSetMeal(setmealDTO);
+        return result ? Result.success() : Result.error("更新失败");
     }
 }
