@@ -26,6 +26,6 @@
                 and s.status = #{status}
             </if>
         </where>
-        order by create_time
+        order by s.create_time
     </select>
 </mapper>
