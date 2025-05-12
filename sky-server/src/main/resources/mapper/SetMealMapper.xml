@@ -75,4 +75,25 @@
         </set>
         where id = #{id}
     </update>
+
+
+    <select id="getSellingSetMealByIds" resultType="java.lang.Long">
+        select
+            id
+        from setmeal
+        where status = 1
+        and id in 
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+    <delete id="deleteSetMealByIds">
+        delete
+        from setmeal
+        where id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
 </mapper>

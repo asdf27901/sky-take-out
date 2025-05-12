@@ -123,6 +123,7 @@ public class DishServiceImpl implements DishService {
                 throw new BusinessException("菜品名称重复");
             }
         }
+        // TODO: 如果图片发生改变需要修改阿里云图片
 
         BeanUtils.copyProperties(dishDTO, dish);
         // 更新菜品

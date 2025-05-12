@@ -17,6 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.NotEmpty;
+import java.util.List;
+
 @RestController
 @Slf4j
 @Validated
@@ -74,5 +77,13 @@ public class SetMealController {
         log.info("修改套餐状态，套餐ID：{}，状态：{}", id, status);
         boolean result = setMealService.updateSetMealStatus(id, status);
         return result ? Result.success() : Result.error("更新失败");
+    }
+
+    @ApiOperation("批量删除套餐")
+    @DeleteMapping
+    public Result<?> deleteSetMeal(@RequestParam @NotEmpty(message = "id不能为空") List<Long> ids) {
+        log.info("批量删除套餐：{}", ids);
+        boolean result = setMealService.deleteSetMealByIds(ids);
+        return result ? Result.success() : Result.error("删除失败");
     }
 }

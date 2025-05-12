@@ -19,6 +19,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -130,6 +131,22 @@ public class SetMealServiceImpl implements SetMealService {
         setmeal.setStatus(status);
         int affectRow = setMealMapper.updateSetMeal(setmeal);
         return affectRow > 0;
+    }
+
+    @Override
+    public boolean deleteSetMealByIds(List<Long> ids) {
+        // 查找处于非起售状态的套餐
+        List<Long> sellingSetMealIds = setMealMapper.getSellingSetMealByIds(ids);
+        List<Long> notSellingSetMealIds = ids.stream().filter(aLong -> !sellingSetMealIds.contains(aLong)).collect(Collectors.toList());
+        if (!CollectionUtils.isEmpty(notSellingSetMealIds)) {
+            // 删除套餐
+            setMealMapper.deleteSetMealByIds(ids);
+
+            // TODO: 需要删除阿里云图片
+            // 删除套餐关联菜品
+            setMealDishMapper.delSetMealDishByIds(ids);
+        }
+        return true;
     }
 
     private void checkDishExistAndSelling(List<SetmealDish> setmealDishes) {
