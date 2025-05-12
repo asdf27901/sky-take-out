@@ -113,6 +113,7 @@ public class SetMealServiceImpl implements SetMealService {
         // 查找套餐下的菜品ID是否存在，并且要求是起售中
         List<SetmealDish> setmealDishes = setmealDTO.getSetmealDishes();
         checkDishExistAndSelling(setmealDishes);
+        setmealDishes.forEach(setmealDish -> setmealDish.setSetmealId(setmeal.getId()));
         setMealDishMapper.saveSetmealDishBatch(setmealDishes);
 
         return affectRow > 0;
