@@ -31,7 +31,7 @@
 
     <resultMap id="SetmealVOMap" type="com.sky.vo.SetmealVO" autoMapping="true">
         <id column="id" property="id"/>
-        <collection property="setmealDishes" javaType="com.sky.entity.SetmealDish" autoMapping="true">
+        <collection property="setmealDishes" ofType="com.sky.entity.SetmealDish" autoMapping="true">
             <id column="setmeal_dish_id" property="id"/>
             <result column="setmeal_dish_name" property="name"/>
             <result column="setmeal_dish_price" property="price"/>
