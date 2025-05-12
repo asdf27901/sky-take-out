@@ -140,6 +140,11 @@ public class DishServiceImpl implements DishService {
         if (dish == null) {
             throw new BusinessException("菜品ID不存在");
         }
+        // 如果菜品关联了套餐就不能停售
+        Long[] setMealWithDish = setMealDishMapper.getCountByDishIds(new Long[]{id});
+        if (setMealWithDish.length != 0) {
+            throw new BusinessException("修改状态失败，菜品ID为：" + Arrays.toString(setMealWithDish) + " 存在关联套餐");
+        }
         dish.setStatus(status);
         int affectRow = dishMapper.updateDish(dish);
         return affectRow > 0;
