@@ -31,9 +31,9 @@ public interface DishMapper {
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int saveDish(Dish dish);
 
-    Long[] getSellingDishListByIds(Long[] ids);
+    List<Long> getSellingDishListByIds(List<Long> ids);
 
-    int deleteByIds(Long[] ids);
+    int deleteByIds(List<Long> ids);
 
     DishVO getDishVOById(Long id);
 

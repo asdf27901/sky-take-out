@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -78,16 +78,16 @@ public class DishServiceImpl implements DishService {
 
     @Override
     @Transactional
-    public boolean deleteDishByIds(Long[] ids) {
+    public boolean deleteDishByIds(List<Long> ids) {
         // 查找需要被删除的菜品ID是否是起售中
-        Long[] sellingDishIds = dishMapper.getSellingDishListByIds(ids);
-        if (sellingDishIds.length != 0) {
-            throw new DeletionNotAllowedException("删除失败，菜品ID为：" + Arrays.toString(sellingDishIds) + " 状态为起售中");
+        List<Long> sellingDishIds = dishMapper.getSellingDishListByIds(ids);
+        if (sellingDishIds.size() != 0) {
+            throw new DeletionNotAllowedException("删除失败，菜品ID为：" + sellingDishIds + " 状态为起售中");
         }
         // 查找菜品ID是否存在关联的套餐
-        Long[] setMealWithDish = setMealDishMapper.getCountByDishIds(ids);
-        if (setMealWithDish.length != 0) {
-            throw new DeletionNotAllowedException("删除失败，菜品ID为：" + Arrays.toString(setMealWithDish) + " 存在关联套餐");
+        List<Long> setMealWithDish = setMealDishMapper.getCountByDishIds(ids);
+        if (setMealWithDish.size() != 0) {
+            throw new DeletionNotAllowedException("删除失败，菜品ID为：" + setMealWithDish + " 存在关联套餐");
         }
         // 删除菜品
         int affectRows = dishMapper.deleteByIds(ids);
@@ -131,7 +131,7 @@ public class DishServiceImpl implements DishService {
         // 更新口味数据
         List<DishFlavor> dishFlavors = dishDTO.getFlavors();
         // 先删除原有的数据，然后再插入
-        dishFlavorMapper.deleteByDishIds(new Long[]{dishDTO.getId()});
+        dishFlavorMapper.deleteByDishIds(Collections.singletonList(dish.getId()));
         // 当dishFlavors非空时才进行插入
         if (!CollectionUtils.isEmpty(dishFlavors)) {
             dishFlavors.forEach(dishFlavor -> dishFlavor.setDishId(dishDTO.getId()));
@@ -147,9 +147,9 @@ public class DishServiceImpl implements DishService {
             throw new BusinessException("菜品ID不存在");
         }
         // 如果菜品关联了套餐就不能停售
-        Long[] setMealWithDish = setMealDishMapper.getCountByDishIds(new Long[]{id});
-        if (setMealWithDish.length != 0) {
-            throw new BusinessException("修改状态失败，菜品ID为：" + Arrays.toString(setMealWithDish) + " 存在关联套餐");
+        List<Long> setMealWithDish = setMealDishMapper.getCountByDishIds(Collections.singletonList(id));
+        if (setMealWithDish.size() != 0) {
+            throw new BusinessException("修改状态失败，菜品ID为：" + setMealWithDish + " 存在关联套餐");
         }
         dish.setStatus(status);
         int affectRow = dishMapper.updateDish(dish);

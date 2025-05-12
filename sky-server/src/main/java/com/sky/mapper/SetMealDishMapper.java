@@ -7,7 +7,7 @@ import java.util.List;
 
 @Mapper
 public interface SetMealDishMapper {
-    Long[] getCountByDishIds(Long[] ids);
+    List<Long> getCountByDishIds(List<Long> ids);
 
-    void saveSetmealDish(List<SetmealDish> setmealDishes);
+    void saveSetmealDishBatch(List<SetmealDish> setmealDishes);
 }
