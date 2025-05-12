@@ -148,7 +148,7 @@ public class DishServiceImpl implements DishService {
         }
         // 如果菜品关联了套餐就不能停售
         List<Long> setMealWithDish = setMealDishMapper.getCountByDishIds(Collections.singletonList(id));
-        if (setMealWithDish.size() != 0) {
+        if (setMealWithDish.size() != 0 && status == 0) {
             throw new BusinessException("修改状态失败，菜品ID为：" + setMealWithDish + " 存在关联套餐");
         }
         dish.setStatus(status);
