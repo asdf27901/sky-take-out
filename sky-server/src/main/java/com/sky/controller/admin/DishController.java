@@ -53,9 +53,9 @@ public class DishController {
             @RequestParam
             @ApiParam("需要删除的菜品ID")
             @NotEmpty(message = "菜品ID不能为空")
-            Long[] ids
+            List<Long> ids
     ) {
-        log.info("删除菜品：{}", Arrays.toString(ids));
+        log.info("删除菜品：{}", ids);
         boolean result = dishService.deleteDishByIds(ids);
         return result ? Result.success() : Result.error("删除失败");
     }
