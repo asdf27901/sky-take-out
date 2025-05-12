@@ -4,24 +4,26 @@
 <mapper namespace="com.sky.mapper.SetMealMapper">
 
     <select id="listAllSetMeal" resultType="com.sky.vo.SetmealVO">
-        select id,
-               category_id,
-               name,
-               price,
-               status,
-               description,
-               image,
-               update_time
-        from setmeal
+        select s.id,
+               s.category_id,
+               s.name,
+               s.price,
+               s.status,
+               s.description,
+               s.image,
+               s.update_time,
+               c.name as category_name
+        from setmeal s
+        left join category c on s.category_id = c.id
         <where>
             <if test="name != null and name != ''">
-                and name like concat('%', #{name}, '%')
+                and s.name like concat('%', #{name}, '%')
             </if>
             <if test="categoryId != null">
-                and category_id = #{categoryId}
+                and s.category_id = #{categoryId}
             </if>
             <if test="status != null">
-                and status = #{status}
+                and s.status = #{status}
             </if>
         </where>
         order by create_time
