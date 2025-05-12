@@ -119,6 +119,19 @@ public class SetMealServiceImpl implements SetMealService {
         return affectRow > 0;
     }
 
+    @Override
+    public boolean updateSetMealStatus(Long id, Integer status) {
+        SetmealVO setmealVO = setMealMapper.getSetMealById(id);
+        if (setmealVO == null) {
+            throw new BusinessException("套餐ID不存在");
+        }
+        Setmeal setmeal = new Setmeal();
+        BeanUtils.copyProperties(setmealVO, setmeal);
+        setmeal.setStatus(status);
+        int affectRow = setMealMapper.updateSetMeal(setmeal);
+        return affectRow > 0;
+    }
+
     private void checkDishExistAndSelling(List<SetmealDish> setmealDishes) {
         Set<Long> dishIds = setmealDishes.stream().map(SetmealDish::getDishId).collect(Collectors.toSet());
         List<Long> sellingDishListByIds = dishMapper.getSellingDishListByIds(new ArrayList<>(dishIds));

@@ -13,4 +13,6 @@ public interface SetMealService {
     SetmealVO getSetMealById(Long id);
 
     boolean updateSetMeal(SetmealDTO setmealDTO);
+
+    boolean updateSetMealStatus(Long id, Integer status);
 }
