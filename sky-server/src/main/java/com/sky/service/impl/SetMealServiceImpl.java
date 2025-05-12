@@ -142,11 +142,11 @@ public class SetMealServiceImpl implements SetMealService {
         int affectRows = 0;
         if (!CollectionUtils.isEmpty(notSellingSetMealIds)) {
             // 删除套餐
-            affectRows += setMealMapper.deleteSetMealByIds(ids);
+            affectRows += setMealMapper.deleteSetMealByIds(notSellingSetMealIds);
 
             // TODO: 需要删除阿里云图片
             // 删除套餐关联菜品
-            setMealDishMapper.delSetMealDishByIds(ids);
+            setMealDishMapper.delSetMealDishByIds(notSellingSetMealIds);
         }
         return affectRows > 0;
     }

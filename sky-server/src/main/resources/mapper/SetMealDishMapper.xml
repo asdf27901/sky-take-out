@@ -25,7 +25,7 @@
     <delete id="delSetMealDishByIds">
         delete
         from setmeal_dish
-        where id in
+        where setmeal_id in
         <foreach collection="ids" item="id" separator="," open="(" close=")">
             #{id}
         </foreach>
