@@ -1,0 +1,72 @@
+package com.sky.service.impl;
+
+import com.sky.dto.SetmealDTO;
+import com.sky.entity.Category;
+import com.sky.entity.Setmeal;
+import com.sky.entity.SetmealDish;
+import com.sky.exception.BusinessException;
+import com.sky.mapper.CategoryMapper;
+import com.sky.mapper.DishMapper;
+import com.sky.mapper.SetMealDishMapper;
+import com.sky.mapper.SetMealMapper;
+import com.sky.service.SetMealService;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+public class SetMealServiceImpl implements SetMealService {
+
+    @Autowired
+    private SetMealMapper setMealMapper;
+
+    @Autowired
+    private CategoryMapper categoryMapper;
+
+    @Autowired
+    private DishMapper dishMapper;
+
+    @Autowired
+    private SetMealDishMapper setMealDishMapper;
+
+    @Override
+    @Transactional
+    public boolean saveSetMeal(SetmealDTO setmealDTO) {
+        // 先查找分类ID是否存在
+        Category category = categoryMapper.getCategoryById(setmealDTO.getCategoryId());
+        if (category == null) {
+            throw new BusinessException("分类ID不存在");
+        }
+
+        // 套餐名称是否重复
+        int count = setMealMapper.getByMealName(setmealDTO.getName());
+        if (count != 0) {
+            throw new BusinessException("套餐名称重复");
+        }
+
+        // 查找套餐下的菜品ID是否存在，并且要求是起售中
+        List<SetmealDish> setmealDishes = setmealDTO.getSetmealDishes();
+        Long[] dishIds = (Long[]) setmealDishes.stream().map(SetmealDish::getDishId).toArray();
+        Long[] sellingDishListByIds = dishMapper.getSellingDishListByIds(dishIds);
+        if (sellingDishListByIds.length != dishIds.length) {
+            throw new BusinessException("菜品ID已停售或者不存在");
+        }
+
+        Setmeal setmeal = new Setmeal();
+        BeanUtils.copyProperties(setmealDTO, setmeal);
+
+        int affectRow = setMealMapper.saveSetMeal(setmeal);
+        setmealDishes.forEach(setmealDish -> setmealDish.setSetmealId(setmeal.getId()));
+
+        //保存关联菜品数据
+        setMealDishMapper.saveSetmealDish(setmealDishes);
+
+
+
+
+        return false;
+    }
+}

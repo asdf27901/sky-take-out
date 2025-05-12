@@ -12,4 +12,12 @@
         </foreach>
         group by dish_id
     </select>
+
+    <insert id="saveSetmealDish">
+        insert into setmeal_dish (setmeal_id, dish_id, name, price, copies)
+        values
+            <foreach collection="setmealDishes" item="setMealDish" separator=",">
+                (#{setMealDish.setmealId}, #{dishId}, #{name}, #{price}, #{copies})
+            </foreach>
+    </insert>
 </mapper>
