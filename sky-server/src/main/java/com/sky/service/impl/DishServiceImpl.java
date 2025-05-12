@@ -21,7 +21,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Consumer;
 
 @Service
 public class DishServiceImpl implements DishService {
@@ -148,5 +147,10 @@ public class DishServiceImpl implements DishService {
         dish.setStatus(status);
         int affectRow = dishMapper.updateDish(dish);
         return affectRow > 0;
+    }
+
+    @Override
+    public List<Dish> getDishListByCategoryId(Long categoryId) {
+        return dishMapper.getDishListByCategoryId(categoryId);
     }
 }

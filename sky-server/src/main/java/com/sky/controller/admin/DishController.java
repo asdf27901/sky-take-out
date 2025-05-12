@@ -2,6 +2,7 @@ package com.sky.controller.admin;
 
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
+import com.sky.entity.Dish;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.DishService;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import java.util.Arrays;
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -89,5 +91,13 @@ public class DishController {
         log.info("修改菜品状态：id: {}, status: {}", id, status);
         boolean result = dishService.updateDishStatus(id, status);
         return result ? Result.success() : Result.error("更新失败");
+    }
+
+    @ApiOperation("根据分类ID查询菜品")
+    @GetMapping("/list")
+    public Result<List<Dish>> listDishByCategoryId(@RequestParam Long categoryId) {
+        log.info("根据分类ID查询菜品：{}", categoryId);
+        List<Dish> dishes = dishService.getDishListByCategoryId(categoryId);
+        return Result.success(dishes);
     }
 }

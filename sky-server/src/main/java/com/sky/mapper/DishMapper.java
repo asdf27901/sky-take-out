@@ -11,6 +11,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.List;
+
 @Mapper
 public interface DishMapper {
 
@@ -40,4 +42,7 @@ public interface DishMapper {
 
     @AutoSet(OperationType.UPDATE)
     int updateDish(Dish dish);
+
+    @Select("select * from dish where category_id = #{categoryId} and status = 1")
+    List<Dish> getDishListByCategoryId(Long categoryId);
 }
