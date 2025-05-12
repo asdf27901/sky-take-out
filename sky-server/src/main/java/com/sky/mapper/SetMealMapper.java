@@ -28,4 +28,6 @@ public interface SetMealMapper {
     int getByMealName(String name);
 
     Page<SetmealVO> listAllSetMeal(SetmealPageQueryDTO setmealPageQueryDTO);
+
+    SetmealVO getSetMealById(Long id);
 }

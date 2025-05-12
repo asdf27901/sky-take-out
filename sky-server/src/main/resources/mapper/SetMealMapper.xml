@@ -28,4 +28,35 @@
         </where>
         order by s.create_time
     </select>
+
+    <resultMap id="SetmealVOMap" type="com.sky.vo.SetmealVO" autoMapping="true">
+        <id column="id" property="id"/>
+        <collection property="setmealDishes" javaType="com.sky.entity.SetmealDish" autoMapping="true">
+            <id column="setmeal_dish_id" property="id"/>
+            <result column="setmeal_dish_name" property="name"/>
+            <result column="setmeal_dish_price" property="price"/>
+        </collection>
+    </resultMap>
+
+    <select id="getSetMealById" resultMap="SetmealVOMap">
+        select s.id,
+               s.category_id,
+               s.name,
+               s.price,
+               s.status,
+               s.description,
+               s.image,
+               s.update_time,
+               c.name as category_name,
+               sd.id as setmeal_dish_id,
+               sd.setmeal_id,
+               sd.dish_id,
+               sd.name as setmeal_dish_name,
+               sd.price as setmeal_dish_price,
+               sd.copies
+        from setmeal s
+                 left join category c on s.category_id = c.id
+                 left join setmeal_dish sd on s.id = sd.setmeal_id
+        where s.id = #{id}
+    </select>
 </mapper>

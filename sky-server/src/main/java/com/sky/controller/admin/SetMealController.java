@@ -39,4 +39,12 @@ public class SetMealController {
         PageResult<SetmealVO> setmealVOPageResult = setMealService.listAllSetMeal(setmealPageQueryDTO);
         return Result.success(setmealVOPageResult);
     }
+
+    @ApiOperation("根据ID查询套餐")
+    @GetMapping("{id}")
+    public Result<SetmealVO> getSetMealById(@PathVariable Long id) {
+        log.info("根据ID查询套餐：{}", id);
+        SetmealVO setmealVO = setMealService.getSetMealById(id);
+        return Result.success(setmealVO);
+    }
 }

@@ -9,4 +9,6 @@ public interface SetMealService {
     boolean saveSetMeal(SetmealDTO setmealDTO);
 
     PageResult<SetmealVO> listAllSetMeal(SetmealPageQueryDTO setmealPageQueryDTO);
+
+    SetmealVO getSetMealById(Long id);
 }

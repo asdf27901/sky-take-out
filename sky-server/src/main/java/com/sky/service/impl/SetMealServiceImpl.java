@@ -87,4 +87,13 @@ public class SetMealServiceImpl implements SetMealService {
                 .doSelectPage(() -> setMealMapper.listAllSetMeal(setmealPageQueryDTO));
         return new PageResult<>(setmealVOPage.getTotal(), setmealVOPage.getResult(), setmealVOPage.getPageSize(), setmealVOPage.getPageNum());
     }
+
+    @Override
+    public SetmealVO getSetMealById(Long id) {
+        SetmealVO setmealVO = setMealMapper.getSetMealById(id);
+        if (setmealVO == null) {
+            throw new BusinessException("套餐ID不存在");
+        }
+        return setmealVO;
+    }
 }
