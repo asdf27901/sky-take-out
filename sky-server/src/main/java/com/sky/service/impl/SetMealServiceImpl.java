@@ -15,7 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class SetMealServiceImpl implements SetMealService {
@@ -49,10 +52,16 @@ public class SetMealServiceImpl implements SetMealService {
 
         // 查找套餐下的菜品ID是否存在，并且要求是起售中
         List<SetmealDish> setmealDishes = setmealDTO.getSetmealDishes();
-        Long[] dishIds = (Long[]) setmealDishes.stream().map(SetmealDish::getDishId).toArray();
-        Long[] sellingDishListByIds = dishMapper.getSellingDishListByIds(dishIds);
-        if (sellingDishListByIds.length != dishIds.length) {
-            throw new BusinessException("菜品ID已停售或者不存在");
+        Set<Long> dishIds = setmealDishes.stream().map(SetmealDish::getDishId).collect(Collectors.toSet());
+        List<Long> sellingDishListByIds = dishMapper.getSellingDishListByIds(new ArrayList<>(dishIds));
+        if (sellingDishListByIds.size() != dishIds.size()) {
+            List<Long> missingDishIds = new ArrayList<>();
+            for (Long dishId : sellingDishListByIds) {
+                if (!dishIds.contains(dishId)) {
+                    missingDishIds.add(dishId);
+                }
+            }
+            throw new BusinessException("菜品ID: [" + missingDishIds + "] 已停售或者不存在");
         }
 
         Setmeal setmeal = new Setmeal();
@@ -62,11 +71,8 @@ public class SetMealServiceImpl implements SetMealService {
         setmealDishes.forEach(setmealDish -> setmealDish.setSetmealId(setmeal.getId()));
 
         //保存关联菜品数据
-        setMealDishMapper.saveSetmealDish(setmealDishes);
+        setMealDishMapper.saveSetmealDishBatch(setmealDishes);
 
-
-
-
-        return false;
+        return affectRow > 0;
     }
 }
