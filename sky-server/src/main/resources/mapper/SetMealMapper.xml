@@ -66,12 +66,12 @@
         <set>
             update_time = #{updateTime},
             update_user = #{updateUser},
-            <if test="categoryId != null">category_id = #{categoryId}</if>
-            <if test="name != null">name = #{name}</if>
-            <if test="price != null">price = #{price}</if>
-            <if test="status != null">status = #{status}</if>
-            <if test="description != null">description = #{description}</if>
-            <if test="image != null">image = #{image}</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="image != null">image = #{image},</if>
         </set>
         where id = #{id}
     </update>
