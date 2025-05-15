@@ -130,7 +130,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({Exception.class})
     public Result<?> exceptionHandler(Exception e) {
         log.error("异常信息：", e);
-        return Result.error("未知异常");
+        return Result.error(e.getMessage());
     }
 
 }
