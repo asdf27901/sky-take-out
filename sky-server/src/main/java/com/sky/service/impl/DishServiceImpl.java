@@ -12,6 +12,7 @@ import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.*;
 import com.sky.result.PageResult;
 import com.sky.service.DishService;
+import com.sky.utils.AliOssUtil;
 import com.sky.vo.DishVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,9 @@ public class DishServiceImpl implements DishService {
 
     @Autowired
     private SetMealDishMapper setMealDishMapper;
+
+    @Autowired
+    private AliOssUtil aliOssUtil;
 
     @Override
     public PageResult<DishVO> getDishList(DishPageQueryDTO dishPageQueryDTO) {
@@ -95,7 +99,9 @@ public class DishServiceImpl implements DishService {
         // 删除菜品对应的口味数据
         affectRows *= dishFlavorMapper.deleteByDishIds(ids);
 
+        List<String> images = dishMapper.getDishImagesByIds(ids);
         // TODO：删除阿里云oss对应文件
+        aliOssUtil.deleteFileBatch(images);
 
         return affectRows >= 0;
     }
@@ -123,7 +129,11 @@ public class DishServiceImpl implements DishService {
                 throw new BusinessException("菜品名称重复");
             }
         }
-        // TODO: 如果图片发生改变需要修改阿里云图片
+
+        if (!dish.getImage().equals(dishDTO.getImage())) {
+            // 图片发生改变需要修改阿里云图片
+            aliOssUtil.deleteFile(dish.getImage());
+        }
 
         BeanUtils.copyProperties(dishDTO, dish);
         // 更新菜品
