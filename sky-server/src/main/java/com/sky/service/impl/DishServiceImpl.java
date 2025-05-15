@@ -93,14 +93,15 @@ public class DishServiceImpl implements DishService {
         if (setMealWithDish.size() != 0) {
             throw new DeletionNotAllowedException("删除失败，菜品ID为：" + setMealWithDish + " 存在关联套餐");
         }
+        // 查找被删除菜品的图片地址
+        List<String> images = dishMapper.getDishImagesByIds(ids);
         // 删除菜品
         int affectRows = dishMapper.deleteByIds(ids);
 
         // 删除菜品对应的口味数据
         affectRows *= dishFlavorMapper.deleteByDishIds(ids);
 
-        List<String> images = dishMapper.getDishImagesByIds(ids);
-        // TODO：删除阿里云oss对应文件
+        // 删除阿里云oss对应文件
         aliOssUtil.deleteFileBatch(images);
 
         return affectRows >= 0;
