@@ -96,4 +96,15 @@
             #{id}
         </foreach>
     </delete>
+
+
+    <select id="getSetMealImagesByIds" resultType="java.lang.String">
+        select
+            image
+        from setmeal
+        where id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
 </mapper>

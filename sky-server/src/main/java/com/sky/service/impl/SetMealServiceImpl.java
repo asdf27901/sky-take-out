@@ -14,6 +14,7 @@ import com.sky.mapper.SetMealDishMapper;
 import com.sky.mapper.SetMealMapper;
 import com.sky.result.PageResult;
 import com.sky.service.SetMealService;
+import com.sky.utils.AliOssUtil;
 import com.sky.vo.SetmealVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,9 @@ public class SetMealServiceImpl implements SetMealService {
 
     @Autowired
     private SetMealDishMapper setMealDishMapper;
+
+    @Autowired
+    private AliOssUtil aliOssUtil;
 
     @Override
     @Transactional
@@ -102,9 +106,14 @@ public class SetMealServiceImpl implements SetMealService {
             }
         }
 
-        // TODO: 更新图片需要把原来的图片删了
         Setmeal setmeal = new Setmeal();
         BeanUtils.copyProperties(setmealDTO, setmeal);
+
+        if (!setmealDTO.getImage().equals(setmealVO.getImage())) {
+            // 如果上传的图片路径不同，需要删除原来的oss图片
+            aliOssUtil.deleteFile(setmealVO.getImage());
+        }
+
         int affectRow = setMealMapper.updateSetMeal(setmeal);
 
         // 更新套餐菜品关系
@@ -141,10 +150,11 @@ public class SetMealServiceImpl implements SetMealService {
 
         int affectRows = 0;
         if (!CollectionUtils.isEmpty(notSellingSetMealIds)) {
+
+            List<String> images = setMealMapper.getSetMealImagesByIds(notSellingSetMealIds);
+            aliOssUtil.deleteFileBatch(images);
             // 删除套餐
             affectRows += setMealMapper.deleteSetMealByIds(notSellingSetMealIds);
-
-            // TODO: 需要删除阿里云图片
             // 删除套餐关联菜品
             setMealDishMapper.delSetMealDishByIds(notSellingSetMealIds);
         }

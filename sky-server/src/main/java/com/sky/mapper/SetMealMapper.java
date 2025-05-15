@@ -39,4 +39,6 @@ public interface SetMealMapper {
     List<Long> getSellingSetMealByIds(List<Long> ids);
 
     int deleteSetMealByIds(List<Long> ids);
+
+    List<String> getSetMealImagesByIds(List<Long> ids);
 }
