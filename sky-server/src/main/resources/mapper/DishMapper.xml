@@ -39,7 +39,7 @@
                 and d.status = #{status}
             </if>
         </where>
-        order by d.create_time
+        order by d.create_time desc
     </select>
     <select id="getSellingDishListByIds" resultType="java.lang.Long">
         select
@@ -97,4 +97,13 @@
         </set>
         where id = #{id}
     </update>
+
+    <select id="getDishImagesByIds" resultType="java.lang.String">
+        select image
+        from dish
+        where id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
 </mapper>
