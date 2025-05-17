@@ -41,4 +41,7 @@ public interface SetMealMapper {
     int deleteSetMealByIds(List<Long> ids);
 
     List<String> getSetMealImagesByIds(List<Long> ids);
+
+    @Select("select * from setmeal where status = 1 and category_id = #{categoryId}")
+    List<Setmeal> getSetMealListByCategoryId(Long categoryId);
 }

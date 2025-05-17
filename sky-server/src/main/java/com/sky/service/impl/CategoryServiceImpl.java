@@ -61,6 +61,11 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public List<Category> listAllCategory() {
+        return categoryMapper.listAllCategory();
+    }
+
+    @Override
     public PageResult<Category> getCategoryList(CategoryPageQueryDTO categoryPageQueryDTO) {
         Page<Category> categoryPage = PageHelper.startPage(categoryPageQueryDTO.getPage(), categoryPageQueryDTO.getPageSize())
                 .doSelectPage(() -> categoryMapper.getCategoryList(categoryPageQueryDTO));

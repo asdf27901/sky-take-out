@@ -15,6 +15,7 @@ import com.sky.mapper.SetMealMapper;
 import com.sky.result.PageResult;
 import com.sky.service.SetMealService;
 import com.sky.utils.AliOssUtil;
+import com.sky.vo.DishItemVO;
 import com.sky.vo.SetmealVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -159,6 +160,20 @@ public class SetMealServiceImpl implements SetMealService {
             setMealDishMapper.delSetMealDishByIds(notSellingSetMealIds);
         }
         return affectRows > 0;
+    }
+
+    @Override
+    public List<Setmeal> getSetMealListByCategoryId(Long categoryId) {
+        return setMealMapper.getSetMealListByCategoryId(categoryId);
+    }
+
+    @Override
+    public List<DishItemVO> getDishListBySetMealId(Long id) {
+        List<DishItemVO> dishItemVOList = setMealDishMapper.getDishListBySetMealId(id);
+        if (CollectionUtils.isEmpty(dishItemVOList)) {
+            throw new BusinessException("当前套餐异常，菜品为空...");
+        }
+        return dishItemVOList;
     }
 
     private void checkDishExistAndSelling(List<SetmealDish> setmealDishes) {

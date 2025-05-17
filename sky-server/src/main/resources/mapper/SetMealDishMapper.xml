@@ -30,4 +30,16 @@
             #{id}
         </foreach>
     </delete>
+
+
+    <select id="getDishListBySetMealId" resultType="com.sky.vo.DishItemVO">
+        select
+               sd.copies,
+               d.name,
+               d.image,
+               d.description
+        from setmeal_dish sd
+                 join dish d on sd.dish_id = d.id
+        where sd.setmeal_id = #{id} and d.status = 1
+    </select>
 </mapper>

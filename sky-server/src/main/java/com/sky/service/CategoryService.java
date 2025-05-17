@@ -23,4 +23,6 @@ public interface CategoryService {
     boolean changeCategoryStatus(Long id, Integer status);
 
     List<Category> listCategoryByType(Integer type);
+
+    List<Category> listAllCategory();
 }

@@ -47,4 +47,6 @@ public interface DishMapper {
     List<Dish> getDishListByCategoryId(Long categoryId);
 
     List<String> getDishImagesByIds(List<Long> ids);
+
+    List<DishVO> getDishVoListByCategoryId(Long categoryId);
 }

@@ -22,4 +22,6 @@ public interface DishService {
     boolean updateDishStatus(Long id, Integer status);
 
     List<Dish> getDishListByCategoryId(Long categoryId);
+
+    List<DishVO> getDishVoListByCategoryId(Long categoryId);
 }
