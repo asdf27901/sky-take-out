@@ -11,6 +11,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableAsync // 开启异步
 @Slf4j
 public class SkyApplication {
+
+    // 解决druid连接池空闲连接长时间没数据互通报错
+    static {
+        System.setProperty("druid.mysql.usePingMethod", "false");
+    }
+
     public static void main(String[] args) {
         SpringApplication.run(SkyApplication.class, args);
         log.info("server started");
