@@ -1,7 +1,10 @@
 package com.sky.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sky.constant.RedisConstant;
 import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
 import com.sky.entity.Category;
@@ -19,6 +22,7 @@ import com.sky.vo.DishItemVO;
 import com.sky.vo.SetmealVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -45,6 +49,9 @@ public class SetMealServiceImpl implements SetMealService {
 
     @Autowired
     private AliOssUtil aliOssUtil;
+
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
     @Override
     @Transactional
@@ -164,7 +171,14 @@ public class SetMealServiceImpl implements SetMealService {
 
     @Override
     public List<Setmeal> getSetMealListByCategoryId(Long categoryId) {
-        return setMealMapper.getSetMealListByCategoryId(categoryId);
+        String jsonStr = (String) redisTemplate.opsForHash().get(RedisConstant.SHOP_CATEGORY_SETMEALS, categoryId.toString());
+        if (jsonStr == null) {
+            List<Setmeal> setmealList = setMealMapper.getSetMealListByCategoryId(categoryId);
+            String json = JSONObject.toJSONString(setmealList);
+            redisTemplate.opsForHash().put(RedisConstant.SHOP_CATEGORY_SETMEALS, categoryId.toString(), json);
+        }
+        // jsonStr不为空，直接转List<Setmeal>
+        return JSON.parseArray(jsonStr, Setmeal.class);
     }
 
     @Override

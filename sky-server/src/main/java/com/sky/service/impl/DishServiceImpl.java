@@ -1,7 +1,10 @@
 package com.sky.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sky.constant.RedisConstant;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Category;
@@ -16,6 +19,7 @@ import com.sky.utils.AliOssUtil;
 import com.sky.vo.DishVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -40,6 +44,9 @@ public class DishServiceImpl implements DishService {
 
     @Autowired
     private AliOssUtil aliOssUtil;
+
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
     @Override
     public PageResult<DishVO> getDishList(DishPageQueryDTO dishPageQueryDTO) {
@@ -175,6 +182,17 @@ public class DishServiceImpl implements DishService {
 
     @Override
     public List<DishVO> getDishVoListByCategoryId(Long categoryId) {
-        return dishMapper.getDishVoListByCategoryId(categoryId);
+
+        String jsonStr = (String) redisTemplate.opsForHash().get(RedisConstant.SHOP_CATEGORY_DISHES, categoryId.toString());
+
+        if (jsonStr == null) {
+            // 对象为空要从数据库中获取
+            List<DishVO> dishVOList = dishMapper.getDishVoListByCategoryId(categoryId);
+            String json = JSONObject.toJSONString(dishVOList);
+            redisTemplate.opsForHash().put(RedisConstant.SHOP_CATEGORY_DISHES, categoryId.toString(), json);
+            return dishVOList;
+        }
+        // 如果jsonStr不为空，那就转对象为List<DishVo>
+        return JSONArray.parseArray(jsonStr, DishVO.class);
     }
 }
