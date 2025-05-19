@@ -3,7 +3,9 @@ package com.sky.config;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -28,8 +30,16 @@ public class RedisConfig {
         // value采用Jackson序列化
         Jackson2JsonRedisSerializer<Object> jacksonSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
         ObjectMapper om = new ObjectMapper();
+
+        // 注册Java8时间模块
+        om.registerModule(new JavaTimeModule());
         om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        // 启用默认的类型信息序列化，支持多态反序列化
         om.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL);
+
+        // 禁用写入日期为timestamps，改为ISO-8601字符串日期格式
+        om.disable(SerializationFeature.WRITE_DATE_KEYS_AS_TIMESTAMPS);
+
         jacksonSerializer.setObjectMapper(om);
 
         template.setValueSerializer(jacksonSerializer);
