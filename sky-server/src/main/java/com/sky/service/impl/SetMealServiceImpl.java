@@ -80,6 +80,7 @@ public class SetMealServiceImpl implements SetMealService {
 
         //保存关联菜品数据
         setMealDishMapper.saveSetmealDishBatch(setmealDishes);
+        deleteAllSetMealCache();
 
         return affectRow > 0;
     }
@@ -133,7 +134,7 @@ public class SetMealServiceImpl implements SetMealService {
         checkDishExistAndSelling(setmealDishes);
         setmealDishes.forEach(setmealDish -> setmealDish.setSetmealId(setmeal.getId()));
         setMealDishMapper.saveSetmealDishBatch(setmealDishes);
-
+        deleteAllSetMealCache();
         return affectRow > 0;
     }
 
@@ -147,6 +148,7 @@ public class SetMealServiceImpl implements SetMealService {
         BeanUtils.copyProperties(setmealVO, setmeal);
         setmeal.setStatus(status);
         int affectRow = setMealMapper.updateSetMeal(setmeal);
+        deleteAllSetMealCache();
         return affectRow > 0;
     }
 
@@ -166,6 +168,7 @@ public class SetMealServiceImpl implements SetMealService {
             // 删除套餐关联菜品
             setMealDishMapper.delSetMealDishByIds(notSellingSetMealIds);
         }
+        deleteAllSetMealCache();
         return affectRows > 0;
     }
 
@@ -202,5 +205,9 @@ public class SetMealServiceImpl implements SetMealService {
             }
             throw new BusinessException("菜品ID: " + missingDishIds + " 已停售或者不存在");
         }
+    }
+
+    private void deleteAllSetMealCache() {
+        redisTemplate.delete(RedisConstant.SHOP_CATEGORY_SETMEALS);
     }
 }

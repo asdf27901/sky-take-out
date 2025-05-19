@@ -83,6 +83,7 @@ public class DishServiceImpl implements DishService {
             // 口味集合不为空时才进行插入
             affectRows = dishFlavorMapper.saveBatch(dishFlavors);
         }
+        deleteAllDishCache();
 
         return affectRow > 0 && affectRows >= 0;
     }
@@ -107,6 +108,7 @@ public class DishServiceImpl implements DishService {
 
         // 删除菜品对应的口味数据
         affectRows *= dishFlavorMapper.deleteByDishIds(ids);
+        deleteAllDishCache();
 
         // 删除阿里云oss对应文件
         aliOssUtil.deleteFileBatch(images);
@@ -156,6 +158,7 @@ public class DishServiceImpl implements DishService {
             dishFlavors.forEach(dishFlavor -> dishFlavor.setDishId(dishDTO.getId()));
             dishFlavorMapper.saveBatch(dishFlavors);
         }
+        deleteAllDishCache();
         return affectRow > 0;
     }
 
@@ -172,6 +175,9 @@ public class DishServiceImpl implements DishService {
         }
         dish.setStatus(status);
         int affectRow = dishMapper.updateDish(dish);
+        // 直接清空菜品缓存
+        deleteAllDishCache();
+
         return affectRow > 0;
     }
 
@@ -194,5 +200,10 @@ public class DishServiceImpl implements DishService {
         }
         // 如果jsonStr不为空，那就转对象为List<DishVo>
         return JSONArray.parseArray(jsonStr, DishVO.class);
+    }
+
+    // 删除所有菜品缓存
+    private void deleteAllDishCache() {
+        redisTemplate.delete(RedisConstant.SHOP_CATEGORY_DISHES);
     }
 }
