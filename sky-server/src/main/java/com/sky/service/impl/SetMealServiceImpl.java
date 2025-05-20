@@ -179,6 +179,7 @@ public class SetMealServiceImpl implements SetMealService {
             List<Setmeal> setmealList = setMealMapper.getSetMealListByCategoryId(categoryId);
             String json = JSONObject.toJSONString(setmealList);
             redisTemplate.opsForHash().put(RedisConstant.SHOP_CATEGORY_SETMEALS, categoryId.toString(), json);
+            return setmealList;
         }
         // jsonStr不为空，直接转List<Setmeal>
         return JSON.parseArray(jsonStr, Setmeal.class);
