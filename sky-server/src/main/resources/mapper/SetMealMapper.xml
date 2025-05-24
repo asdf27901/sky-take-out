@@ -57,7 +57,7 @@
         from setmeal s
                  left join category c on s.category_id = c.id
                  left join setmeal_dish sd on s.id = sd.setmeal_id
-        where s.id = #{id}
+        where s.id = #{id} and s.status = 1
     </select>
 
 

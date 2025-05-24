@@ -37,7 +37,7 @@ public interface DishMapper {
 
     DishVO getDishVOById(Long id);
 
-    @Select("select * from dish where id = #{id}")
+    @Select("select * from dish where id = #{id} and status = 1")
     Dish getDishById(Long id);
 
     @AutoSet(OperationType.UPDATE)
