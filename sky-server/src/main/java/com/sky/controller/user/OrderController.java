@@ -1,8 +1,10 @@
 package com.sky.controller.user;
 
+import com.sky.dto.OrdersPaymentDTO;
 import com.sky.dto.OrdersSubmitDTO;
 import com.sky.result.Result;
 import com.sky.service.OrderService;
+import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderSubmitVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,6 +29,14 @@ public class OrderController {
         log.info("提交订单: {}", ordersSubmitDTO);
         OrderSubmitVO submitVO = orderService.submit(ordersSubmitDTO);
         return Result.success(submitVO);
+    }
+
+    @PutMapping("/payment")
+    @ApiOperation("订单支付")
+    public Result<OrderPaymentVO> payment(@RequestBody @Validated OrdersPaymentDTO ordersPaymentDTO) {
+        log.info("订单支付：{}", ordersPaymentDTO);
+        orderService.payment(ordersPaymentDTO);
+        return Result.success();
     }
 
 }

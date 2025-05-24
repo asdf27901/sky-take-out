@@ -1,18 +1,26 @@
 package com.sky.service.impl;
 
 import com.sky.context.BaseContext;
+import com.sky.dto.OrdersPaymentDTO;
 import com.sky.dto.OrdersSubmitDTO;
 import com.sky.entity.*;
+import com.sky.enums.OrderEvent;
+import com.sky.enums.OrderStatus;
 import com.sky.exception.BusinessException;
+import com.sky.exception.OrderBusinessException;
 import com.sky.mapper.AddressMapper;
 import com.sky.mapper.OrderDetailMapper;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.ShoppingCartMapper;
 import com.sky.service.OrderService;
+import com.sky.service.state.OrderStateContext;
 import com.sky.vo.OrderSubmitVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.statemachine.StateMachine;
+import org.springframework.statemachine.config.StateMachineFactory;
+import org.springframework.statemachine.support.DefaultStateMachineContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -40,6 +48,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private OrderDetailMapper orderDetailMapper;
+
+    @Autowired
+    private StateMachineFactory<OrderStatus, OrderEvent> stateMachineFactory;
+
+    @Autowired
+    private OrderStateContext orderStateContext;
 
     @Override
     @Transactional
@@ -121,6 +135,59 @@ public class OrderServiceImpl implements OrderService {
                 .reduce(new BigDecimal("0"),  // 初始值
                         (subtotal, cart) -> subtotal.add(cart.getAmount().multiply(BigDecimal.valueOf(cart.getNumber()))), // 累加函数
                         BigDecimal::add);  // combiner，串行流时不重要
+    }
+
+    /**
+     * 订单支付
+     *
+     * @param ordersPaymentDTO
+     * @return
+     */
+    public void payment(OrdersPaymentDTO ordersPaymentDTO) {
+        // 当前登录用户id
+        Long userId = BaseContext.getCurrentId();
+        Orders order = orderMapper.getOrderByOrderNumber(userId, ordersPaymentDTO.getOrderNumber());
+        if (order == null) {
+            throw new OrderBusinessException("订单不存在");
+        }
+
+        // 查到订单需要判断当前的订单状态是否是待支付订单, 通过状态机进行判断
+        // 获取状态机
+        StateMachine<OrderStatus, OrderEvent> stateMachine = buildOrderStateMachine(order);
+
+        orderStateContext.init(order, stateMachine);
+        orderStateContext.pay();
+
+        // 由于没有商户资质，以下方法全部舍弃，直接调用支付成功的方法
+//        User user = userMapper.getById(userId);
+//
+//        //调用微信支付接口，生成预支付交易单
+//        JSONObject jsonObject = weChatPayUtil.pay(
+//                ordersPaymentDTO.getOrderNumber(), //商户订单号
+//                new BigDecimal(0.01), //支付金额，单位 元
+//                "苍穹外卖订单", //商品描述
+//                user.getOpenid() //微信用户的openid
+//        );
+//
+//        if (jsonObject.getString("code") != null && jsonObject.getString("code").equals("ORDERPAID")) {
+//            throw new OrderBusinessException("该订单已支付");
+//        }
+//
+//        OrderPaymentVO vo = jsonObject.toJavaObject(OrderPaymentVO.class);
+//        vo.setPackageStr(jsonObject.getString("package"));
+    }
+
+    private StateMachine<OrderStatus, OrderEvent> buildOrderStateMachine(Orders order) {
+        // 获取新的状态机实例
+        StateMachine<OrderStatus, OrderEvent> stateMachine = stateMachineFactory.getStateMachine(order.getNumber());
+        // 先停止，重置状态为订单当前状态
+        stateMachine.stopReactively().block();
+        stateMachine.getStateMachineAccessor()
+                .doWithAllRegions(access -> access.resetStateMachineReactively(
+                        new DefaultStateMachineContext<>(OrderStatus.fromState(order.getStatus()), null, null, null)
+                ).block());
+        stateMachine.startReactively().block();
+        return stateMachine;
     }
 
 }
