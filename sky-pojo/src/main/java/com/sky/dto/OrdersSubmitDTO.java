@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 
 @Data
 @ApiModel("订单提交模型")
-@MultiFieldAssociationCheck(when = "tablewareStatus == 1", must = "tablewareNumber != null", message = "餐具数量不能为空", errorField = "tablewareNumber")
+@MultiFieldAssociationCheck(when = "tablewareStatus == 0", must = "tablewareNumber != null", message = "餐具数量不能为空", errorField = "tablewareNumber")
 public class OrdersSubmitDTO implements Serializable {
 
     //地址簿id
