@@ -77,4 +77,9 @@ public class PendingPaymentState implements IOrderState<OrderStatus, OrderEvent>
     public void delivery(Orders order, StateMachine<OrderStatus, OrderEvent> stateMachine) {
         throw new OrderBusinessException("订单未完成支付，无法操作");
     }
+
+    @Override
+    public void complete(Orders order, StateMachine<OrderStatus, OrderEvent> stateMachine) {
+        throw new OrderBusinessException("订单未完成支付，不要重复操作");
+    }
 }

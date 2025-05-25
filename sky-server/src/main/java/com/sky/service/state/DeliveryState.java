@@ -56,4 +56,17 @@ public class DeliveryState implements IOrderState<OrderStatus, OrderEvent> {
     public void delivery(Orders order, StateMachine<OrderStatus, OrderEvent> stateMachine) {
         throw new OrderBusinessException("订单已经派送中，不要重复操作");
     }
+
+    @Override
+    public void complete(Orders order, StateMachine<OrderStatus, OrderEvent> stateMachine) {
+        Message<OrderEvent> event = MessageBuilder.withPayload(OrderEvent.RECEIVE)
+                .setHeader("order", order).build();
+        boolean accepted = stateMachine.sendEvent(event);
+        if (accepted) {
+            order.setStatus(stateMachine.getState().getId().getState());
+            order.setDeliveryTime(LocalDateTime.now());
+            orderMapper.update(order);
+            log.info("{}已完成", order.getNumber());
+        }
+    }
 }

@@ -63,4 +63,9 @@ public class ConfirmedState implements IOrderState<OrderStatus, OrderEvent>{
             log.info("{}派送成功", order.getNumber());
         }
     }
+
+    @Override
+    public void complete(Orders order, StateMachine<OrderStatus, OrderEvent> stateMachine) {
+        throw new OrderBusinessException("订单未派送，无法操作");
+    }
 }

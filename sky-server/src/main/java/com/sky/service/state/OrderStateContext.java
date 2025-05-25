@@ -74,4 +74,8 @@ public class OrderStateContext {
     public void delivery(){
         iOrderState.delivery(order, stateMachine);
     }
+
+    public void complete() {
+        iOrderState.complete(order, stateMachine);
+    }
 }

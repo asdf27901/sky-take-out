@@ -33,4 +33,9 @@ public class CanceledState implements IOrderState<OrderStatus, OrderEvent> {
     public void delivery(Orders order, StateMachine<OrderStatus, OrderEvent> stateMachine) {
         throw new OrderBusinessException("订单已取消，不要重复操作！");
     }
+
+    @Override
+    public void complete(Orders order, StateMachine<OrderStatus, OrderEvent> stateMachine) {
+        throw new OrderBusinessException("订单已取消，不要重复操作！");
+    }
 }
