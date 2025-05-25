@@ -35,6 +35,7 @@ public class ToBeConfirmedState implements IOrderState<OrderStatus, OrderEvent>{
         if (accepted) {
             order.setStatus(stateMachine.getState().getId().getState());
             order.setPayStatus(Orders.REFUND);
+            order.setCancelReason("用户取消");
             orderMapper.update(order);
             log.info("{}取消成功", order.getNumber());
         }

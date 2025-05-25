@@ -45,6 +45,7 @@ public class PendingPaymentState implements IOrderState<OrderStatus, OrderEvent>
         boolean accepted = stateMachine.sendEvent(event);
         if (accepted) {
             order.setStatus(stateMachine.getState().getId().getState());
+            order.setCancelReason("用户取消");
             orderMapper.update(order);
             log.info("{}取消成功", order.getNumber());
         }
