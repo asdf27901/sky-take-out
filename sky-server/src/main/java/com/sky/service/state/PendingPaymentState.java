@@ -36,7 +36,7 @@ public class PendingPaymentState implements IOrderState<OrderStatus, OrderEvent>
     }
 
     @Override
-    public void cancel(Orders order, StateMachine<OrderStatus, OrderEvent> stateMachine) {
+    public void userCancel(Orders order, StateMachine<OrderStatus, OrderEvent> stateMachine) {
         // 待付款状态下取消订单
         // 直接修改订单状态为已取消即可
         Message<OrderEvent> event = MessageBuilder.withPayload(OrderEvent.CANCEL)

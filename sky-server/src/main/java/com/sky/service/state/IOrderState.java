@@ -6,5 +6,5 @@ import org.springframework.statemachine.StateMachine;
 public interface IOrderState<S, E> {
     void pay(Orders order, StateMachine<S, E> stateMachine);
 
-    void cancel(Orders order, StateMachine<S, E> stateMachine);
+    void userCancel(Orders order, StateMachine<S, E> stateMachine);
 }

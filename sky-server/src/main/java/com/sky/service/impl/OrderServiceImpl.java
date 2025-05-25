@@ -256,18 +256,18 @@ public class OrderServiceImpl implements OrderService {
             throw new OrderBusinessException("订单不存在");
         }
 
-        Integer orderStatus = order.getStatus();
-        if (
-                !Objects.equals(orderStatus, Orders.PENDING_PAYMENT)
-                && !Objects.equals(orderStatus, Orders.TO_BE_CONFIRMED)
-                && !Objects.equals(orderStatus, Orders.CANCELLED)
-        ) {
-            throw new OrderBusinessException("当前订单状态不支持用户取消");
-        }
+//        Integer orderStatus = order.getStatus();
+//        if (
+//                !Objects.equals(orderStatus, Orders.PENDING_PAYMENT)
+//                && !Objects.equals(orderStatus, Orders.TO_BE_CONFIRMED)
+//                && !Objects.equals(orderStatus, Orders.CANCELLED)
+//        ) {
+//            throw new OrderBusinessException("当前订单状态不支持用户取消");
+//        }
         // 创建状态机对象
         StateMachine<OrderStatus, OrderEvent> stateMachine = buildOrderStateMachine(order);
         orderStateContext.init(order, stateMachine);
-        orderStateContext.cancel();
+        orderStateContext.userCancel();  // 区分是后台取消还是用户取消，就不需要判断状态了
     }
 
     @Override

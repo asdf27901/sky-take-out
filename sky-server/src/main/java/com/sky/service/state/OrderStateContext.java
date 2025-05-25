@@ -39,7 +39,7 @@ public class OrderStateContext {
         iOrderState.pay(order, stateMachine);
     }
 
-    public void cancel() {
-        iOrderState.cancel(order, stateMachine);
+    public void userCancel() {
+        iOrderState.userCancel(order, stateMachine);
     }
 }
