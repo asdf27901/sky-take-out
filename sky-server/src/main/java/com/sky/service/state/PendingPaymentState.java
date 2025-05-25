@@ -57,4 +57,9 @@ public class PendingPaymentState implements IOrderState<OrderStatus, OrderEvent>
     public void confirmOrder(Orders order, StateMachine<OrderStatus, OrderEvent> stateMachine) {
         throw new OrderBusinessException("用户未完成付款，接单失败");
     }
+
+    @Override
+    public void adminCancel(Orders order, StateMachine<OrderStatus, OrderEvent> stateMachine, String cancelReason) {
+        // 商家的取消订单操作
+    }
 }

@@ -46,4 +46,8 @@ public class OrderStateContext {
     public void confirmOrder() {
         iOrderState.confirmOrder(order, stateMachine);
     }
+
+    public void adminCancel(String cancelReason) {
+        iOrderState.adminCancel(order, stateMachine, cancelReason);
+    }
 }

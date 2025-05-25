@@ -42,6 +42,9 @@ public class OrderStateMachineConfig extends EnumStateMachineConfigurerAdapter<O
                 .source(OrderStatus.TO_BE_CONFIRMED).target(OrderStatus.CANCELLED).event(OrderEvent.USER_CANCEL) // 待接单 -> 已取消状态
                 .and()
                 .withExternal()
+                .source(OrderStatus.TO_BE_CONFIRMED).target(OrderStatus.CANCELLED).event(OrderEvent.ADMIN_CANCEL) // 待接单 -> 已取消状态（商家）
+                .and()
+                .withExternal()
                 .source(OrderStatus.CONFIRMED).target(OrderStatus.DELIVERY_IN_PROGRESS).event(OrderEvent.DELIVERY) // 已接单 -> 派送中状态
                 .and()
                 .withExternal()

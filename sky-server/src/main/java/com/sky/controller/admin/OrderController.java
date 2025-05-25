@@ -2,6 +2,7 @@ package com.sky.controller.admin;
 
 import com.sky.dto.OrdersConfirmDTO;
 import com.sky.dto.OrdersPageQueryDTO;
+import com.sky.dto.OrdersRejectionDTO;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.OrderService;
@@ -14,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RestController("AdminOrderController")
 @Slf4j
@@ -55,5 +58,13 @@ public class OrderController {
         log.info("查询各个状态的订单数量");
         OrderStatisticsVO statisticsVO = orderService.statistics();
         return Result.success(statisticsVO);
+    }
+
+    @PutMapping("/rejection")
+    @ApiOperation("拒单")
+    public Result<?> rejectOrder(@RequestBody @Valid OrdersRejectionDTO ordersRejectionDTO) {
+        log.info("拒单，ID：{}，拒单原因：{}", ordersRejectionDTO.getId(), ordersRejectionDTO.getRejectionReason());
+        orderService.rejectOrder(ordersRejectionDTO);
+        return Result.success();
     }
 }

@@ -55,4 +55,20 @@ public class ToBeConfirmedState implements IOrderState<OrderStatus, OrderEvent>{
             log.info("{}已接单", order.getNumber());
         }
     }
+
+    @Override
+    public void adminCancel(Orders order, StateMachine<OrderStatus, OrderEvent> stateMachine, String cancelReason) {
+        // 就是商家的拒单操作
+        Message<OrderEvent> event = MessageBuilder.withPayload(OrderEvent.ADMIN_CANCEL)
+                .setHeader("order", order).build();
+        boolean accepted = stateMachine.sendEvent(event);
+        if (accepted) {
+            order.setStatus(stateMachine.getState().getId().getState());
+            order.setPayStatus(Orders.REFUND);
+            order.setCancelReason(cancelReason);
+            order.setCancelTime(LocalDateTime.now());
+            orderMapper.update(order);
+            log.info("{}取消成功", order.getNumber());
+        }
+    }
 }

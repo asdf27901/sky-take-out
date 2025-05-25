@@ -5,6 +5,7 @@ import com.github.pagehelper.PageHelper;
 import com.sky.context.BaseContext;
 import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.dto.OrdersPaymentDTO;
+import com.sky.dto.OrdersRejectionDTO;
 import com.sky.dto.OrdersSubmitDTO;
 import com.sky.entity.*;
 import com.sky.enums.OrderEvent;
@@ -321,6 +322,18 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderStatisticsVO statistics() {
         return orderMapper.statistics();
+    }
+
+    @Override
+    public void rejectOrder(OrdersRejectionDTO ordersRejectionDTO) {
+        Orders order = orderMapper.getOrderByOrderId(ordersRejectionDTO.getId());
+        if (order == null) {
+            throw new OrderBusinessException("订单不存在");
+        }
+        // 创建状态机对象
+        StateMachine<OrderStatus, OrderEvent> stateMachine = buildOrderStateMachine(order);
+        orderStateContext.init(order, stateMachine);
+        orderStateContext.adminCancel(ordersRejectionDTO.getRejectionReason());
     }
 
     private StateMachine<OrderStatus, OrderEvent> buildOrderStateMachine(Orders order) {
