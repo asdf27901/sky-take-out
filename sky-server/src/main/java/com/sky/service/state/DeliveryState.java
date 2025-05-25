@@ -51,4 +51,9 @@ public class DeliveryState implements IOrderState<OrderStatus, OrderEvent> {
             log.info("{}取消成功", order.getNumber());
         }
     }
+
+    @Override
+    public void delivery(Orders order, StateMachine<OrderStatus, OrderEvent> stateMachine) {
+        throw new OrderBusinessException("订单已经派送中，不要重复操作");
+    }
 }

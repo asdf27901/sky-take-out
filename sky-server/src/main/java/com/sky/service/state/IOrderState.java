@@ -11,4 +11,6 @@ public interface IOrderState<S, E> {
     void confirmOrder(Orders order, StateMachine<S, E> stateMachine);
 
     void adminCancel(Orders order, StateMachine<S, E> stateMachine, String cancelReason);
+
+    void delivery(Orders order, StateMachine<S, E> stateMachine);
 }

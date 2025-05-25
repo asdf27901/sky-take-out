@@ -70,4 +70,8 @@ public class OrderStateContext {
     public void adminCancel(String cancelReason) {
         iOrderState.adminCancel(order, stateMachine, cancelReason);
     }
+
+    public void delivery(){
+        iOrderState.delivery(order, stateMachine);
+    }
 }

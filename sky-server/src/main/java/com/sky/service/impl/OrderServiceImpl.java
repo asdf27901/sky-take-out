@@ -345,6 +345,18 @@ public class OrderServiceImpl implements OrderService {
         orderStateContext.adminCancel(ordersCancelDTO.getCancelReason());
     }
 
+    @Override
+    public void deliveryOrder(Long id) {
+        Orders order = orderMapper.getOrderByOrderId(id);
+        if (order == null) {
+            throw new OrderBusinessException("订单不存在");
+        }
+        // 创建状态机对象
+        StateMachine<OrderStatus, OrderEvent> stateMachine = buildOrderStateMachine(order);
+        orderStateContext.init(order, stateMachine);
+        orderStateContext.delivery();
+    }
+
     private StateMachine<OrderStatus, OrderEvent> buildOrderStateMachine(Orders order) {
         // 获取新的状态机实例
         StateMachine<OrderStatus, OrderEvent> stateMachine = stateMachineFactory.getStateMachine(order.getNumber());
