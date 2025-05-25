@@ -12,6 +12,8 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @Slf4j
 public class ToBeConfirmedState implements IOrderState<OrderStatus, OrderEvent>{
@@ -36,6 +38,7 @@ public class ToBeConfirmedState implements IOrderState<OrderStatus, OrderEvent>{
             order.setStatus(stateMachine.getState().getId().getState());
             order.setPayStatus(Orders.REFUND);
             order.setCancelReason("用户取消");
+            order.setCancelTime(LocalDateTime.now());
             orderMapper.update(order);
             log.info("{}取消成功", order.getNumber());
         }
