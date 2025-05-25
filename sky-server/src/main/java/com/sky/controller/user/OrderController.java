@@ -55,7 +55,7 @@ public class OrderController {
     @ApiOperation("查询订单详情")
     public Result<OrderVO> getOrderDetail(@PathVariable @ApiParam(value = "订单id", required = true) Long id) {
         log.info("查询订单详情，ID：{}", id);
-        OrderVO orderVO = orderService.getOrderDetail(id);
+        OrderVO orderVO = orderService.getUserOrderDetail(id);
         return Result.success(orderVO);
     }
 

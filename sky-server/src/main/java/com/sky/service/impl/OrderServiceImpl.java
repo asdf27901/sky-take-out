@@ -194,7 +194,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderVO getOrderDetail(Long id) {
+    public OrderVO getUserOrderDetail(Long id) {
         Long userId = BaseContext.getCurrentId();
         Orders order = orderMapper.getOrderByOrderId(userId, id);
         if (order == null) {
@@ -270,6 +270,19 @@ public class OrderServiceImpl implements OrderService {
         Page<OrderVO> orderVOPage = PageHelper.startPage(ordersPageQueryDTO.getPage(), ordersPageQueryDTO.getPageSize())
                 .doSelectPage(() -> orderMapper.getHistoryOrders(ordersPageQueryDTO));
         return new PageResult<>(orderVOPage.getTotal(), orderVOPage.getResult(), orderVOPage.getPageSize(), orderVOPage.getPageNum());
+    }
+
+    @Override
+    public OrderVO getOrderDetail(Long id) {
+        Orders order = orderMapper.getOrderByOrderId(id);
+        if (order == null) {
+            throw new OrderBusinessException("订单不存在");
+        }
+        List<OrderDetail> orderDetailList = orderDetailMapper.getOrderDetailByOrderId(id);
+        OrderVO orderVO = new OrderVO();
+        BeanUtils.copyProperties(order, orderVO);
+        orderVO.setOrderDetailList(orderDetailList);
+        return orderVO;
     }
 
     private StateMachine<OrderStatus, OrderEvent> buildOrderStateMachine(Orders order) {

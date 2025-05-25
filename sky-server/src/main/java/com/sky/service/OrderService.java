@@ -19,11 +19,13 @@ public interface OrderService {
 
     PageResult<OrderVO> getHistoryOrders(OrdersPageQueryDTO ordersPageQueryDTO);
 
-    OrderVO getOrderDetail(Long id);
+    OrderVO getUserOrderDetail(Long id);
 
     void repeatOrder(Long id);
 
     void userCancelOrder(Long id);
 
     PageResult<OrderVO> getOrderListByCondition(OrdersPageQueryDTO ordersPageQueryDTO);
+
+    OrderVO getOrderDetail(Long id);
 }
