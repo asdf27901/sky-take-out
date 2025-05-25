@@ -24,4 +24,6 @@ public interface OrderService {
     void repeatOrder(Long id);
 
     void userCancelOrder(Long id);
+
+    PageResult<OrderVO> getOrderListByCondition(OrdersPageQueryDTO ordersPageQueryDTO);
 }

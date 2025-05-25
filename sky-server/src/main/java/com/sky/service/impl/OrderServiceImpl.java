@@ -265,6 +265,13 @@ public class OrderServiceImpl implements OrderService {
         orderStateContext.cancel();
     }
 
+    @Override
+    public PageResult<OrderVO> getOrderListByCondition(OrdersPageQueryDTO ordersPageQueryDTO) {
+        Page<OrderVO> orderVOPage = PageHelper.startPage(ordersPageQueryDTO.getPage(), ordersPageQueryDTO.getPageSize())
+                .doSelectPage(() -> orderMapper.getHistoryOrders(ordersPageQueryDTO));
+        return new PageResult<>(orderVOPage.getTotal(), orderVOPage.getResult(), orderVOPage.getPageSize(), orderVOPage.getPageNum());
+    }
+
     private StateMachine<OrderStatus, OrderEvent> buildOrderStateMachine(Orders order) {
         // 获取新的状态机实例
         StateMachine<OrderStatus, OrderEvent> stateMachine = stateMachineFactory.getStateMachine(order.getNumber());

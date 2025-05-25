@@ -83,6 +83,10 @@
         <where>
             <if test="userId != null">and o.user_id = #{userId}</if>
             <if test="status != null">and o.status = #{status}</if>
+            <if test="number != null">and o.number = #{number}</if>
+            <if test="phone != null">and o.phone = #{phone}</if>
+            <if test="beginTime != null">and o.order_time &gt;= #{beginTime}</if>
+            <if test="endTime != null">and o.order_time &lt;= #{endTime}</if>
         </where>
         order by o.order_time desc
     </select>
