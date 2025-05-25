@@ -7,4 +7,6 @@ public interface IOrderState<S, E> {
     void pay(Orders order, StateMachine<S, E> stateMachine);
 
     void userCancel(Orders order, StateMachine<S, E> stateMachine);
+
+    void confirmOrder(Orders order, StateMachine<S, E> stateMachine);
 }

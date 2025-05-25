@@ -42,4 +42,8 @@ public class OrderStateContext {
     public void userCancel() {
         iOrderState.userCancel(order, stateMachine);
     }
+
+    public void confirmOrder() {
+        iOrderState.confirmOrder(order, stateMachine);
+    }
 }

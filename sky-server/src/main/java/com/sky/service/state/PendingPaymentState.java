@@ -3,6 +3,7 @@ package com.sky.service.state;
 import com.sky.entity.Orders;
 import com.sky.enums.OrderEvent;
 import com.sky.enums.OrderStatus;
+import com.sky.exception.OrderBusinessException;
 import com.sky.mapper.OrderMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,5 +50,10 @@ public class PendingPaymentState implements IOrderState<OrderStatus, OrderEvent>
             orderMapper.update(order);
             log.info("{}取消成功", order.getNumber());
         }
+    }
+
+    @Override
+    public void confirmOrder(Orders order, StateMachine<OrderStatus, OrderEvent> stateMachine) {
+        throw new OrderBusinessException("用户未完成付款，接单失败");
     }
 }

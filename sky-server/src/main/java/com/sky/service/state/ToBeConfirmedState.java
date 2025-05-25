@@ -40,4 +40,16 @@ public class ToBeConfirmedState implements IOrderState<OrderStatus, OrderEvent>{
             log.info("{}取消成功", order.getNumber());
         }
     }
+
+    @Override
+    public void confirmOrder(Orders order, StateMachine<OrderStatus, OrderEvent> stateMachine) {
+        Message<OrderEvent> event = MessageBuilder.withPayload(OrderEvent.CONFIRMED)
+                .setHeader("order", order).build();
+        boolean accepted = stateMachine.sendEvent(event);
+        if (accepted) {
+            order.setStatus(stateMachine.getState().getId().getState());
+            orderMapper.update(order);
+            log.info("{}已接单", order.getNumber());
+        }
+    }
 }

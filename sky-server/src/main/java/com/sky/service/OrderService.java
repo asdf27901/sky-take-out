@@ -28,4 +28,6 @@ public interface OrderService {
     PageResult<OrderVO> getOrderListByCondition(OrdersPageQueryDTO ordersPageQueryDTO);
 
     OrderVO getOrderDetail(Long id);
+
+    void confirmOrder(Long id);
 }
