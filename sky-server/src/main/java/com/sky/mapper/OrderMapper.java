@@ -3,6 +3,7 @@ package com.sky.mapper;
 import com.github.pagehelper.Page;
 import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.entity.Orders;
+import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderVO;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
@@ -36,4 +37,11 @@ public interface OrderMapper {
 
     @Select("select * from orders where id = #{id}")
     Orders getOrderByOrderId(Long id);
+
+    @Select("select" +
+            " (select count(1) from orders where status = 2) as to_be_confirmed," +
+            " (select count(1) from orders where status = 3) as confirmed," +
+            " (select count(1) from orders where status = 4) as delivery_in_progress"
+    )
+    OrderStatisticsVO statistics();
 }

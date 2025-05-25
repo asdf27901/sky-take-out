@@ -15,6 +15,7 @@ import com.sky.mapper.*;
 import com.sky.result.PageResult;
 import com.sky.service.OrderService;
 import com.sky.service.state.OrderStateContext;
+import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
 import lombok.extern.slf4j.Slf4j;
@@ -315,6 +316,11 @@ public class OrderServiceImpl implements OrderService {
         StateMachine<OrderStatus, OrderEvent> stateMachine = buildOrderStateMachine(order);
         orderStateContext.init(order, stateMachine);
         orderStateContext.confirmOrder();
+    }
+
+    @Override
+    public OrderStatisticsVO statistics() {
+        return orderMapper.statistics();
     }
 
     private StateMachine<OrderStatus, OrderEvent> buildOrderStateMachine(Orders order) {
