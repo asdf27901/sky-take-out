@@ -38,4 +38,8 @@ public class OrderStateContext {
     public void pay() {
         iOrderState.pay(order, stateMachine);
     }
+
+    public void cancel() {
+        iOrderState.cancel(order, stateMachine);
+    }
 }

@@ -34,4 +34,56 @@
         </set>
         where id = #{id}
     </update>
+    
+    <resultMap id="OrderVOMap" type="com.sky.vo.OrderVO" autoMapping="true">
+        <id column="id" property="id"/>
+        <result column="order_number" property="number"/>
+        <result column="real_amount" property="amount"/>
+        <collection property="orderDetailList" column="" ofType="com.sky.entity.OrderDetail" autoMapping="true">
+            <id column="order_detail_id" property="id"/>
+        </collection>
+    </resultMap>
+
+    <select id="getHistoryOrders" resultMap="OrderVOMap">
+        select o.id,
+               o.number as order_number,
+               o.status,
+               o.user_id,
+               o.address_book_id,
+               o.order_time,
+               o.checkout_time,
+               o.pay_method,
+               o.pay_status,
+               o.amount as real_amount,
+               o.remark,
+               o.phone,
+               o.address,
+               o.user_name,
+               o.consignee,
+               o.cancel_reason,
+               o.rejection_reason,
+               o.cancel_time,
+               o.estimated_delivery_time,
+               o.delivery_status,
+               o.delivery_time,
+               o.pack_amount,
+               o.tableware_number,
+               o.tableware_status,
+               od.id as order_detail_id,
+               od.name,
+               od.image,
+               od.order_id,
+               od.dish_id,
+               od.setmeal_id,
+               od.dish_flavor,
+               od.number,
+               od.amount
+        from orders o
+                 join order_detail od on o.id = od.order_id
+        <where>
+            <if test="userId != null">and o.user_id = #{userId}</if>
+            <if test="status != null">and o.status = #{status}</if>
+        </where>
+        order by o.order_time desc
+    </select>
 </mapper>

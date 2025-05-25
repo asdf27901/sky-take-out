@@ -1,6 +1,9 @@
 package com.sky.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.sky.context.BaseContext;
+import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.dto.OrdersPaymentDTO;
 import com.sky.dto.OrdersSubmitDTO;
 import com.sky.entity.*;
@@ -8,13 +11,12 @@ import com.sky.enums.OrderEvent;
 import com.sky.enums.OrderStatus;
 import com.sky.exception.BusinessException;
 import com.sky.exception.OrderBusinessException;
-import com.sky.mapper.AddressMapper;
-import com.sky.mapper.OrderDetailMapper;
-import com.sky.mapper.OrderMapper;
-import com.sky.mapper.ShoppingCartMapper;
+import com.sky.mapper.*;
+import com.sky.result.PageResult;
 import com.sky.service.OrderService;
 import com.sky.service.state.OrderStateContext;
 import com.sky.vo.OrderSubmitVO;
+import com.sky.vo.OrderVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,7 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -54,6 +57,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private OrderStateContext orderStateContext;
+
+    @Autowired
+    private DishMapper dishMapper;
+
+    @Autowired
+    private SetMealMapper setMealMapper;
 
     @Override
     @Transactional
@@ -175,6 +184,85 @@ public class OrderServiceImpl implements OrderService {
 //
 //        OrderPaymentVO vo = jsonObject.toJavaObject(OrderPaymentVO.class);
 //        vo.setPackageStr(jsonObject.getString("package"));
+    }
+
+    @Override
+    public PageResult<OrderVO> getHistoryOrders(OrdersPageQueryDTO ordersPageQueryDTO) {
+        Page<OrderVO> orderVOPage = PageHelper.startPage(ordersPageQueryDTO.getPage(), ordersPageQueryDTO.getPageSize())
+                .doSelectPage(() -> orderMapper.getHistoryOrders(ordersPageQueryDTO));
+        return new PageResult<>(orderVOPage.getTotal(), orderVOPage.getResult(), ordersPageQueryDTO.getPage(), orderVOPage.getPageNum());
+    }
+
+    @Override
+    public OrderVO getOrderDetail(Long id) {
+        Long userId = BaseContext.getCurrentId();
+        Orders order = orderMapper.getOrderByOrderId(userId, id);
+        if (order == null) {
+            throw new OrderBusinessException("订单不存在");
+        }
+        List<OrderDetail> orderDetailList = orderDetailMapper.getOrderDetailByOrderId(id);
+        OrderVO orderVO = new OrderVO();
+        BeanUtils.copyProperties(order, orderVO);
+        orderVO.setOrderDetailList(orderDetailList);
+        return orderVO;
+    }
+
+    @Override
+    public void repeatOrder(Long id) {
+        List<OrderDetail> orderDetailList = orderDetailMapper.getOrderDetailByOrderId(id);
+        if (CollectionUtils.isEmpty(orderDetailList)) {
+            throw new OrderBusinessException("订单不存在");
+        }
+
+        // 如果存在则重新加入购物车，同时需要判断加入购物车的菜品或者套餐是否存在或者已经停售
+        List<Long> dishIdList = new ArrayList<>();
+        List<Long> setmealIdList = new ArrayList<>();
+        for (OrderDetail orderDetail : orderDetailList) {
+            Long dishId = orderDetail.getDishId();
+            if (dishId != null) {
+                dishIdList.add(dishId);
+            } else {
+                setmealIdList.add(orderDetail.getSetmealId());
+            }
+        }
+        List<Long> sellingDishIds = new ArrayList<>();
+        List<Long> sellingSetMealIds = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(dishIdList)) {  // 如果菜品数量本来就是0，就没必要去查数据库了
+            sellingDishIds = dishMapper.getSellingDishListByIds(dishIdList);
+        }
+        if (!CollectionUtils.isEmpty(setmealIdList)) {  // 如果套餐数量本来就是0，就没必要去查数据库了
+            sellingSetMealIds = setMealMapper.getSellingSetMealByIds(setmealIdList);
+        }
+
+        if (sellingDishIds.size() != dishIdList.size() || setmealIdList.size() != sellingSetMealIds.size()) {
+            throw new OrderBusinessException("存在菜品或套餐下架，无法重新创建购物车");
+        }
+
+        List<ShoppingCart> shoppingCartList = new ArrayList<>();
+        for (OrderDetail orderDetail : orderDetailList) {
+            ShoppingCart shoppingCart = new ShoppingCart();
+            BeanUtils.copyProperties(orderDetail, shoppingCart);
+            shoppingCart.setId(null);
+            shoppingCart.setCreateTime(LocalDateTime.now());
+            shoppingCart.setUserId(BaseContext.getCurrentId());
+            shoppingCartList.add(shoppingCart);
+        }
+        shoppingCartMapper.saveItemBatch(shoppingCartList);
+    }
+
+    @Override
+    public void userCancelOrder(Long id) {
+        // 涉及到状态流转，所以需要使用状态机
+        Long userId = BaseContext.getCurrentId();
+        Orders order = orderMapper.getOrderByOrderId(userId, id);
+        if (order == null) {
+            throw new OrderBusinessException("订单不存在");
+        }
+
+        // 创建状态机对象
+        StateMachine<OrderStatus, OrderEvent> stateMachine = buildOrderStateMachine(order);
+        orderStateContext.init(order, stateMachine);
+        orderStateContext.cancel();
     }
 
     private StateMachine<OrderStatus, OrderEvent> buildOrderStateMachine(Orders order) {

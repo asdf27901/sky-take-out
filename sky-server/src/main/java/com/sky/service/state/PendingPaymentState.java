@@ -34,4 +34,19 @@ public class PendingPaymentState implements IOrderState<OrderStatus, OrderEvent>
             log.info("{}订单支付成功", order.getNumber());
         }
     }
+
+    @Override
+    public void cancel(Orders order, StateMachine<OrderStatus, OrderEvent> stateMachine) {
+        // 待付款状态下取消订单
+        // 直接修改订单状态为已取消即可
+        Message<OrderEvent> event = MessageBuilder.withPayload(OrderEvent.CANCEL)
+                .setHeader("order", order).build();
+
+        boolean accepted = stateMachine.sendEvent(event);
+        if (accepted) {
+            order.setStatus(stateMachine.getState().getId().getState());
+            orderMapper.update(order);
+            log.info("{}取消成功", order.getNumber());
+        }
+    }
 }
