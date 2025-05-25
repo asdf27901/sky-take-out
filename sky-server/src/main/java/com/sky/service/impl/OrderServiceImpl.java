@@ -274,6 +274,21 @@ public class OrderServiceImpl implements OrderService {
     public PageResult<OrderVO> getOrderListByCondition(OrdersPageQueryDTO ordersPageQueryDTO) {
         Page<OrderVO> orderVOPage = PageHelper.startPage(ordersPageQueryDTO.getPage(), ordersPageQueryDTO.getPageSize())
                 .doSelectPage(() -> orderMapper.getHistoryOrders(ordersPageQueryDTO));
+
+        // 需要添加菜品信息
+        List<OrderVO> voList = orderVOPage.getResult();
+        voList.forEach(orderVO -> {
+            List<OrderDetail> orderDetailList = orderVO.getOrderDetailList();
+            StringBuilder orderDishes = new StringBuilder();
+            for (OrderDetail detail : orderDetailList) {
+                orderDishes.append(detail.getName())
+                        .append("*")
+                        .append(detail.getNumber())
+                        .append(";");
+            }
+            orderVO.setOrderDishes(orderDishes.toString());
+        });
+
         return new PageResult<>(orderVOPage.getTotal(), orderVOPage.getResult(), orderVOPage.getPageSize(), orderVOPage.getPageNum());
     }
 
