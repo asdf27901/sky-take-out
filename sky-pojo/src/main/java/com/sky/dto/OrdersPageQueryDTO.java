@@ -5,8 +5,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.format.annotation.DateTimeFormat;
-
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -22,23 +20,25 @@ public class OrdersPageQueryDTO implements Serializable {
     @Range(min = 1, max = Integer.MAX_VALUE, message = "分页数量错误")
     private int pageSize = 10;
 
+    @ApiModelProperty("订单号")
     private String number;
 
-    private  String phone;
+    @ApiModelProperty("手机号码")
+    private String phone;
 
-    @ApiModelProperty(value = "订单状态", required = true)
+    @ApiModelProperty(value = "订单状态")
     @Range(min = 1, max = 6, message = "订单状态错误")
-    @NotNull(message = "订单状态不能为空")
     private Integer status;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @ApiModelProperty("下单时间")
     private LocalDateTime beginTime;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @ApiModelProperty("下单时间")
     private LocalDateTime endTime;
 
-    @ApiModelProperty(value = "用户ID", required = true)
-    @NotNull(message = "用户ID不能为空")
+    @ApiModelProperty(value = "用户ID")
     private Long userId;
 
 }
