@@ -196,7 +196,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderVO getUserOrderDetail(Long id) {
         Long userId = BaseContext.getCurrentId();
-        Orders order = orderMapper.getOrderByOrderId(userId, id);
+        Orders order = orderMapper.getOrderByOrderIdAndUserId(userId, id);
         if (order == null) {
             throw new OrderBusinessException("订单不存在");
         }
@@ -254,7 +254,7 @@ public class OrderServiceImpl implements OrderService {
     public void userCancelOrder(Long id) {
         // 涉及到状态流转，所以需要使用状态机
         Long userId = BaseContext.getCurrentId();
-        Orders order = orderMapper.getOrderByOrderId(userId, id);
+        Orders order = orderMapper.getOrderByOrderIdAndUserId(userId, id);
         if (order == null) {
             throw new OrderBusinessException("订单不存在");
         }
