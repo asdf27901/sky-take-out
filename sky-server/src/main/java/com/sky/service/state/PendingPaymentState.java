@@ -40,7 +40,7 @@ public class PendingPaymentState implements IOrderState<OrderStatus, OrderEvent>
     public void userCancel(Orders order, StateMachine<OrderStatus, OrderEvent> stateMachine) {
         // 待付款状态下取消订单
         // 直接修改订单状态为已取消即可
-        Message<OrderEvent> event = MessageBuilder.withPayload(OrderEvent.CANCEL)
+        Message<OrderEvent> event = MessageBuilder.withPayload(OrderEvent.USER_CANCEL)
                 .setHeader("order", order).build();
 
         boolean accepted = stateMachine.sendEvent(event);

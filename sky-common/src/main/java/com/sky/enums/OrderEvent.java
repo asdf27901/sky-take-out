@@ -5,5 +5,6 @@ public enum OrderEvent {
     CONFIRMED,  // 接单
     DELIVERY,  // 派送
     RECEIVE,  // 确认收货
-    CANCEL  // 取消
+    USER_CANCEL,  // 用户取消
+    ADMIN_CANCEL // 后台取消
 }

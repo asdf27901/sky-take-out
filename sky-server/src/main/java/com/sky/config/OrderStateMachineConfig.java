@@ -33,25 +33,25 @@ public class OrderStateMachineConfig extends EnumStateMachineConfigurerAdapter<O
                 .source(OrderStatus.PENDING_PAYMENT).target(OrderStatus.TO_BE_CONFIRMED).event(OrderEvent.PAY)  // 待付款 -> 待接单状态
                 .and()
                 .withExternal()
-                .source(OrderStatus.PENDING_PAYMENT).target(OrderStatus.CANCELLED).event(OrderEvent.CANCEL) // 待付款 -> 已取消状态
+                .source(OrderStatus.PENDING_PAYMENT).target(OrderStatus.CANCELLED).event(OrderEvent.USER_CANCEL) // 待付款 -> 已取消状态
                 .and()
                 .withExternal()
                 .source(OrderStatus.TO_BE_CONFIRMED).target(OrderStatus.CONFIRMED).event(OrderEvent.CONFIRMED) // 待接单 -> 已接单状态
                 .and()
                 .withExternal()
-                .source(OrderStatus.TO_BE_CONFIRMED).target(OrderStatus.CANCELLED).event(OrderEvent.CANCEL) // 待接单 -> 已取消状态
+                .source(OrderStatus.TO_BE_CONFIRMED).target(OrderStatus.CANCELLED).event(OrderEvent.USER_CANCEL) // 待接单 -> 已取消状态
                 .and()
                 .withExternal()
                 .source(OrderStatus.CONFIRMED).target(OrderStatus.DELIVERY_IN_PROGRESS).event(OrderEvent.DELIVERY) // 已接单 -> 派送中状态
                 .and()
                 .withExternal()
-                .source(OrderStatus.CONFIRMED).target(OrderStatus.CANCELLED).event(OrderEvent.CANCEL) // 已接单 -> 已取消状态
+                .source(OrderStatus.CONFIRMED).target(OrderStatus.CANCELLED).event(OrderEvent.ADMIN_CANCEL) // 已接单 -> 已取消状态
                 .and()
                 .withExternal()
                 .source(OrderStatus.DELIVERY_IN_PROGRESS).target(OrderStatus.COMPLETED).event(OrderEvent.RECEIVE) // 派送中 -> 已完成状态
                 .and()
                 .withExternal()
-                .source(OrderStatus.DELIVERY_IN_PROGRESS).target(OrderStatus.CANCELLED).event(OrderEvent.CANCEL);  // 派送中 -> 已取消状态
+                .source(OrderStatus.DELIVERY_IN_PROGRESS).target(OrderStatus.CANCELLED).event(OrderEvent.ADMIN_CANCEL);  // 派送中 -> 已取消状态
     }
 
     @Override

@@ -30,7 +30,7 @@ public class ToBeConfirmedState implements IOrderState<OrderStatus, OrderEvent>{
     public void userCancel(Orders order, StateMachine<OrderStatus, OrderEvent> stateMachine) {
         // 待接单状态下取消订单
         // 由于已经付款完成，所以取消订单需要修改订单状态和支付状态
-        Message<OrderEvent> event = MessageBuilder.withPayload(OrderEvent.CANCEL)
+        Message<OrderEvent> event = MessageBuilder.withPayload(OrderEvent.USER_CANCEL)
                 .setHeader("order", order).build();
 
         boolean accepted = stateMachine.sendEvent(event);
