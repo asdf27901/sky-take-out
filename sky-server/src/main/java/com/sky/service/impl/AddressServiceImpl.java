@@ -69,6 +69,7 @@ public class AddressServiceImpl implements AddressService {
     public boolean updateAddress(AddressBook addressBook) {
         AddressBook address = getAddressById(addressBook.getId());
         BeanUtils.copyProperties(addressBook, address);
+        address.setUserId(BaseContext.getCurrentId());
         int affectRow = addressMapper.updateAddress(address);
         return affectRow > 0;
     }
