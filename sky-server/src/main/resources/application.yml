@@ -76,3 +76,12 @@ sky:
     we-chat-pay-cert-file-path: ${sky.wechat.private-key-file-path}
     notify-url: ${sky.wechat.notify-url}
     refund-notify-url: ${sky.wechat.refund-notify-url}
+  baidu:
+    ak: ${sky.baidu.ak}
+    location-url: ${sky.baidu.location-url}
+    distance-url: ${sky.baidu.distance-url}
+  shop:
+    location:
+      lng: ${sky.shop.location.lng}
+      lat: ${sky.shop.location.lat}
+    limit-distance: ${sky.shop.limit-distance}

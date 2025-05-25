@@ -92,4 +92,8 @@ public class AddressBook implements Serializable {
     @ApiModelProperty(value = "是否为默认地址", required = true)
     @Range(max = 1L, message = "isDefault不合法")
     private Integer isDefault = 0;
+
+    public String detailedAddress() {
+        return provinceName + cityName + districtName + detail;
+    }
 }
