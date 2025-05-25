@@ -43,7 +43,7 @@ public class OrderController {
 
     @PutMapping("/confirm")
     @ApiOperation("接单")
-    public Result<?> confirmOrder(@RequestBody OrdersConfirmDTO confirmDTO) {
+    public Result<?> confirmOrder(@RequestBody @Valid OrdersConfirmDTO confirmDTO) {
         log.info("商家接单：{}", confirmDTO);
         orderService.confirmOrder(confirmDTO.getId());
         return Result.success();
