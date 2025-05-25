@@ -18,6 +18,14 @@ public class OrderStateContext {
     private PendingPaymentState pendingPaymentState;
     @Autowired
     private ToBeConfirmedState toBeConfirmedState;
+    @Autowired
+    private ConfirmedState confirmedState;
+    @Autowired
+    private CanceledState canceledState;
+    @Autowired
+    private DeliveryState deliveryState;
+    @Autowired
+    private CompleteState completeState;
 
     public void init(Orders order, StateMachine<OrderStatus, OrderEvent> stateMachine) {
         this.order = order;
@@ -29,6 +37,18 @@ public class OrderStateContext {
                 break;
             case TO_BE_CONFIRMED: // 待接单状态
                 this.iOrderState = toBeConfirmedState;
+                break;
+            case CONFIRMED: // 已接单状态
+                this.iOrderState = confirmedState;
+                break;
+            case DELIVERY_IN_PROGRESS:
+                this.iOrderState = deliveryState; // 派送中状态
+                break;
+            case COMPLETED:
+                this.iOrderState = completeState; // 已完成状态
+                break;
+            case CANCELLED:
+                this.iOrderState = canceledState;  // 已取消状态
                 break;
             default:
                 throw new OrderBusinessException("不存在的订单状态");

@@ -61,5 +61,15 @@ public class PendingPaymentState implements IOrderState<OrderStatus, OrderEvent>
     @Override
     public void adminCancel(Orders order, StateMachine<OrderStatus, OrderEvent> stateMachine, String cancelReason) {
         // 商家的取消订单操作
+        Message<OrderEvent> event = MessageBuilder.withPayload(OrderEvent.ADMIN_CANCEL)
+                .setHeader("order", order).build();
+        boolean accepted = stateMachine.sendEvent(event);
+        if (accepted) {
+            order.setStatus(stateMachine.getState().getId().getState());
+            order.setCancelReason(cancelReason);
+            order.setCancelTime(LocalDateTime.now());
+            orderMapper.update(order);
+            log.info("{}取消成功", order.getNumber());
+        }
     }
 }

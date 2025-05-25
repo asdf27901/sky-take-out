@@ -36,6 +36,9 @@ public class OrderStateMachineConfig extends EnumStateMachineConfigurerAdapter<O
                 .source(OrderStatus.PENDING_PAYMENT).target(OrderStatus.CANCELLED).event(OrderEvent.USER_CANCEL) // 待付款 -> 已取消状态
                 .and()
                 .withExternal()
+                .source(OrderStatus.PENDING_PAYMENT).target(OrderStatus.CANCELLED).event(OrderEvent.ADMIN_CANCEL) // 待付款 -> 已取消状态(商家)
+                .and()
+                .withExternal()
                 .source(OrderStatus.TO_BE_CONFIRMED).target(OrderStatus.CONFIRMED).event(OrderEvent.CONFIRMED) // 待接单 -> 已接单状态
                 .and()
                 .withExternal()
@@ -48,13 +51,16 @@ public class OrderStateMachineConfig extends EnumStateMachineConfigurerAdapter<O
                 .source(OrderStatus.CONFIRMED).target(OrderStatus.DELIVERY_IN_PROGRESS).event(OrderEvent.DELIVERY) // 已接单 -> 派送中状态
                 .and()
                 .withExternal()
-                .source(OrderStatus.CONFIRMED).target(OrderStatus.CANCELLED).event(OrderEvent.ADMIN_CANCEL) // 已接单 -> 已取消状态
+                .source(OrderStatus.CONFIRMED).target(OrderStatus.CANCELLED).event(OrderEvent.ADMIN_CANCEL) // 已接单 -> 已取消状态(商家)
                 .and()
                 .withExternal()
                 .source(OrderStatus.DELIVERY_IN_PROGRESS).target(OrderStatus.COMPLETED).event(OrderEvent.RECEIVE) // 派送中 -> 已完成状态
                 .and()
                 .withExternal()
-                .source(OrderStatus.DELIVERY_IN_PROGRESS).target(OrderStatus.CANCELLED).event(OrderEvent.ADMIN_CANCEL);  // 派送中 -> 已取消状态
+                .source(OrderStatus.DELIVERY_IN_PROGRESS).target(OrderStatus.CANCELLED).event(OrderEvent.ADMIN_CANCEL)  // 派送中 -> 已取消状态(商家)
+                .and()
+                .withExternal()
+                .source(OrderStatus.COMPLETED).target(OrderStatus.CANCELLED).event(OrderEvent.ADMIN_CANCEL);  // 已完成 -> 已取消(商家)
     }
 
     @Override
