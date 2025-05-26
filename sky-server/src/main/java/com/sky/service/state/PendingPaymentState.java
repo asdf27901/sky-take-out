@@ -1,10 +1,12 @@
 package com.sky.service.state;
 
+import com.alibaba.fastjson.JSON;
 import com.sky.entity.Orders;
 import com.sky.enums.OrderEvent;
 import com.sky.enums.OrderStatus;
 import com.sky.exception.OrderBusinessException;
 import com.sky.mapper.OrderMapper;
+import com.sky.websocket.WebSocketServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
@@ -13,6 +15,8 @@ import org.springframework.statemachine.StateMachine;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -20,6 +24,9 @@ public class PendingPaymentState implements IOrderState<OrderStatus, OrderEvent>
 
     @Autowired
     private OrderMapper orderMapper;
+
+    @Autowired
+    private WebSocketServer webSocketServer;
 
     @Override
     public void pay(Orders order, StateMachine<OrderStatus, OrderEvent> stateMachine) {
@@ -33,6 +40,14 @@ public class PendingPaymentState implements IOrderState<OrderStatus, OrderEvent>
             order.setCheckoutTime(LocalDateTime.now());
             orderMapper.update(order);
             log.info("{}订单支付成功", order.getNumber());
+
+            // 发送WebSocket通知
+            Map<String, Object> message = new HashMap<>();
+            message.put("type", 1);
+            message.put("orderId", order.getId());
+            message.put("content", "订单号: " + order.getNumber());
+
+            webSocketServer.sendToAllClient(JSON.toJSONString(message));
         }
     }
 
