@@ -18,12 +18,14 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class WebSocketServer {
 
-    private final Map<String, Session> sessions = new ConcurrentHashMap<>();
+    // 每次有新的客户端连接，WebSocket 容器都会创建一个新的 WebSocketServer 实例
+    // 所以必须要用static修饰才能保证消息推送成功
+    private final static Map<String, Session> SESSIONS = new ConcurrentHashMap<>();
 
     @OnOpen
     public void onOpen(Session session, @PathParam("sid") String sid) {
         // 关联 session 和 sid
-        sessions.put(sid, session);
+        SESSIONS.put(sid, session);
         log.info("建立连接，sessionId=" + session.getId());
     }
 
@@ -35,11 +37,11 @@ public class WebSocketServer {
     @OnClose
     public void onClose(@PathParam("sid") String sid)  {
         log.info("连接断开:" + sid);
-        sessions.remove(sid);
+        SESSIONS.remove(sid);
     }
 
     public void sendToAllClient(String message) {
-        Collection<Session> session = sessions.values();
+        Collection<Session> session = SESSIONS.values();
         for (Session s : session) {
             try {
                 //服务器向客户端发送消息
