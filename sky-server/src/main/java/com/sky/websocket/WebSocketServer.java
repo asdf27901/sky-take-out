@@ -43,7 +43,9 @@ public class WebSocketServer {
         for (Session s : session) {
             try {
                 //服务器向客户端发送消息
+                log.info("推送消息" + message);
                 s.getBasicRemote().sendText(message);
+                log.info("消息推送成功");
             } catch (Exception e) {
                 e.printStackTrace();
             }
