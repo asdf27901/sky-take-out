@@ -1,5 +1,6 @@
 package com.sky.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sky.context.BaseContext;
@@ -17,6 +18,7 @@ import com.sky.utils.DistanceUtil;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import com.sky.websocket.WebSocketServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +69,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Value("${sky.shop.limit-distance}")
     private Double limitDistance;
+
+    @Autowired
+    private WebSocketServer webSocketServer;
 
     @Override
     @Transactional
@@ -381,6 +386,26 @@ public class OrderServiceImpl implements OrderService {
         StateMachine<OrderStatus, OrderEvent> stateMachine = buildOrderStateMachine(order);
         orderStateContext.init(order, stateMachine);
         orderStateContext.complete();
+    }
+
+    @Override
+    public void remindOrder(Long id) {
+        Orders order = orderMapper.getOrderByOrderId(id);
+        if (order == null) {
+            throw new OrderBusinessException("订单不存在");
+        }
+
+        if (!Objects.equals(order.getStatus(), Orders.TO_BE_CONFIRMED)) {
+            throw new OrderBusinessException("当前订单状态不支持催单");
+        }
+
+        // 发送WebSocket通知
+        Map<String, Object> message = new HashMap<>();
+        message.put("type", 2);
+        message.put("orderId", order.getId());
+        message.put("content", "订单号: " + order.getNumber());
+
+        webSocketServer.sendToAllClient(JSON.toJSONString(message));
     }
 
     private StateMachine<OrderStatus, OrderEvent> buildOrderStateMachine(Orders order) {
