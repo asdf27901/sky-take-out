@@ -10,6 +10,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.List;
+
 @Mapper
 public interface OrderMapper {
 
@@ -44,4 +46,12 @@ public interface OrderMapper {
             " (select count(1) from orders where status = 4) as delivery_in_progress"
     )
     OrderStatisticsVO statistics();
+
+    @Select("SELECT * FROM orders WHERE order_time <= NOW() - INTERVAL 15 MINUTE AND status = 1")
+    List<Orders> findTimeoutOrders();
+
+    void updateOrderBatch(List<Orders> orders);
+
+    @Select("SELECT * FROM orders WHERE order_time <= NOW() - INTERVAL 1 HOUR AND status = 4")
+    List<Orders> existsOrdersWithStatus();
 }
