@@ -61,4 +61,8 @@ public interface OrderMapper {
     List<ReportServiceImpl.TurnoverDate> getTurnoverList(LocalDate begin, LocalDate end);
 
     List<ReportServiceImpl.OrderDate> getOrdersStatistics(LocalDate begin, LocalDate end);
+
+    List<ReportServiceImpl.SalesTop10> getSaleDishTop10(LocalDate begin, LocalDate end);
+
+    List<ReportServiceImpl.SalesTop10> getSaleSetMealTop10(LocalDate begin, LocalDate end);
 }

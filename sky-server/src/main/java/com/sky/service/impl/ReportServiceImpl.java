@@ -5,6 +5,7 @@ import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
 import com.sky.vo.OrderReportVO;
+import com.sky.vo.SalesTop10ReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import lombok.Data;
@@ -15,8 +16,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.StringJoiner;
+import java.util.*;
 
 @Service
 public class ReportServiceImpl implements ReportService {
@@ -107,6 +107,44 @@ public class ReportServiceImpl implements ReportService {
                 .build();
     }
 
+    @Override
+    public SalesTop10ReportVO getSalesTop10(LocalDate begin, LocalDate end) {
+        DateRange dateRange = checkDate(begin, end);
+        begin = dateRange.getBegin();
+        end = dateRange.getEnd();
+
+        StringJoiner nameList = new StringJoiner(",");
+        StringJoiner numberList = new StringJoiner(",");
+
+        // 获取菜品前10
+        List<SalesTop10> salesTop10DishList = orderMapper.getSaleDishTop10(begin, end);
+        List<SalesTop10> salesTop10SetMealList = orderMapper.getSaleSetMealTop10(begin, end);
+
+        Map<String, Integer> map = new HashMap<>();
+        salesTop10DishList.forEach(item -> {
+            map.put(item.name, item.count);
+        });
+        salesTop10SetMealList.forEach(item -> {
+            map.put(item.name, item.count);
+        });
+        List<Map.Entry<String, Integer>> sorted10 = new ArrayList<>(map.entrySet());
+        sorted10.sort((o1, o2) -> o2.getValue() - o1.getValue());
+
+        for (int i = 0; i < sorted10.size(); i++) {
+            if (i == 10) {
+                break;
+            }
+            nameList.add(sorted10.get(i).getKey());
+            numberList.add(sorted10.get(i).getValue().toString());
+        }
+        System.out.println(sorted10);
+
+        return SalesTop10ReportVO.builder()
+                .nameList(nameList.toString())
+                .numberList(numberList.toString())
+                .build();
+    }
+
     private DateRange checkDate(LocalDate begin, LocalDate end) {
         if (begin == null && end == null) {
             throw new BusinessException("范围过大，请限定时间范围");
@@ -152,6 +190,12 @@ public class ReportServiceImpl implements ReportService {
         private LocalDate date;
         private Integer dailyNewOrders;
         private Integer dailyEffectiveNewOrders;
+    }
+
+    @Data
+    public static class SalesTop10 {
+        private String name;
+        private Integer count;
     }
 }
 

@@ -167,4 +167,28 @@
         FROM date_range dr
         ORDER BY dr.dt;
     </select>
+
+    <select id="getSaleDishTop10" resultType="com.sky.service.impl.ReportServiceImpl$SalesTop10">
+        select
+            d.name,
+            sum(od.number) as count
+        from orders o
+        join order_detail od on o.id = od.order_id
+        join dish d on od.dish_id = d.id
+        where DATE(o.order_time) &gt;= #{begin} and DATE(o.order_time) &lt;= #{end} and o.status = 5
+        group by d.id, d.name
+        order by count desc limit 10
+    </select>
+
+    <select id="getSaleSetMealTop10" resultType="com.sky.service.impl.ReportServiceImpl$SalesTop10">
+        select
+            s.name,
+            sum(od.number) as count
+        from orders o
+        join order_detail od on o.id = od.order_id
+        join setmeal s on od.setmeal_id = s.id
+        where DATE(o.order_time) &gt;= #{begin} and DATE(o.order_time) &lt;= #{end} and o.status = 5 and od.setmeal_id is not null
+        group by s.id, s.name
+        order by count desc limit 10
+    </select>
 </mapper>
