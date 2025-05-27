@@ -11,24 +11,21 @@
             SELECT DATE_ADD(dt, INTERVAL 1 DAY)
             FROM date_range
             WHERE dt &lt;= DATE(#{end})
-        ),
-        daily_new AS (
-            SELECT DATE(create_time) AS created_date, COUNT(*) AS new_count
-            FROM user
-            WHERE create_time &gt;= DATE(#{begin})
-            AND create_time &lt;= DATE(#{end})
-            GROUP BY DATE(create_time)
         )
         SELECT
             dr.dt AS date,
-            COALESCE(dn.new_count, 0) AS daily_new_users,
+            (
+                select
+                    count(1)
+                from user u
+                where DATE(u.create_time) = dr.dt
+            ) AS daily_new_users,
             (
                 SELECT COUNT(1)
                 FROM user u
                 WHERE DATE(u.create_time) &lt;= dr.dt
             ) AS cumulative_users
         FROM date_range dr
-            LEFT JOIN daily_new dn ON dr.dt = dn.created_date
         ORDER BY dr.dt;
     </select>
 </mapper>
