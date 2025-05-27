@@ -10,7 +10,7 @@
             UNION ALL
             SELECT DATE_ADD(dt, INTERVAL 1 DAY)
             FROM date_range
-            WHERE dt &lt;= DATE(#{end})
+            WHERE dt &lt; DATE(#{end})
         )
         SELECT
             dr.dt AS date,

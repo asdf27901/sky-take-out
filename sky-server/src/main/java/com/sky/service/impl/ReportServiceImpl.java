@@ -137,7 +137,6 @@ public class ReportServiceImpl implements ReportService {
             nameList.add(sorted10.get(i).getKey());
             numberList.add(sorted10.get(i).getValue().toString());
         }
-        System.out.println(sorted10);
 
         return SalesTop10ReportVO.builder()
                 .nameList(nameList.toString())

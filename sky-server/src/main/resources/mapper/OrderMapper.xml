@@ -131,7 +131,7 @@
             UNION ALL
             SELECT DATE_ADD(dt, INTERVAL 1 DAY)
             FROM date_range
-            WHERE dt &lt;= #{end}
+            WHERE dt &lt; #{end}
         )
         SELECT
             dr.dt AS date,
@@ -148,7 +148,7 @@
             UNION ALL
             SELECT DATE_ADD(dt, INTERVAL 1 DAY)
             FROM date_range
-            WHERE dt &lt;= #{end}
+            WHERE dt &lt; #{end}
         )
         SELECT
             dr.dt AS date,
@@ -175,7 +175,7 @@
         from orders o
         join order_detail od on o.id = od.order_id
         join dish d on od.dish_id = d.id
-        where DATE(o.order_time) &gt;= #{begin} and DATE(o.order_time) &lt;= #{end} and o.status = 5
+        where DATE(o.order_time) &gt;= #{begin} and DATE(o.order_time) &lt; #{end} and o.status = 5
         group by d.id, d.name
         order by count desc limit 10
     </select>
@@ -187,7 +187,7 @@
         from orders o
         join order_detail od on o.id = od.order_id
         join setmeal s on od.setmeal_id = s.id
-        where DATE(o.order_time) &gt;= #{begin} and DATE(o.order_time) &lt;= #{end} and o.status = 5 and od.setmeal_id is not null
+        where DATE(o.order_time) &gt;= #{begin} and DATE(o.order_time) &lt; #{end} and o.status = 5 and od.setmeal_id is not null
         group by s.id, s.name
         order by count desc limit 10
     </select>
