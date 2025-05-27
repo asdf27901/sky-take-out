@@ -22,7 +22,11 @@
         SELECT
             dr.dt AS date,
             COALESCE(dn.new_count, 0) AS daily_new_users,
-            SUM(COALESCE(dn.new_count, 0)) OVER (ORDER BY dr.dt ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS cumulative_users
+            (
+                SELECT COUNT(1)
+                FROM user u
+                WHERE DATE(u.create_time) &lt;= dr.dt
+            ) AS cumulative_users
         FROM date_range dr
             LEFT JOIN daily_new dn ON dr.dt = dn.created_date
         ORDER BY dr.dt;
