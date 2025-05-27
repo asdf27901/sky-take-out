@@ -6,6 +6,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
 
+import java.time.LocalDate;
+
 @Mapper
 public interface UserMapper {
 
@@ -16,4 +18,10 @@ public interface UserMapper {
             "values (#{openid}, #{name}, #{phone}, #{sex}, #{idNumber}, #{avatar}, #{createTime})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     void saveUser(User user);
+
+    @Select("select * from user where DATE(create_time) <= #{begin}")
+    Integer countTotalUserByDate(LocalDate begin);
+
+    @Select("select count(1) from user where DATE(create_time) = #{begin}")
+    CharSequence countNewUserByDate(LocalDate begin);
 }

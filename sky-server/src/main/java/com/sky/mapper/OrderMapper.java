@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Mapper
@@ -54,4 +55,7 @@ public interface OrderMapper {
 
     @Select("SELECT * FROM orders WHERE order_time <= NOW() - INTERVAL 1 HOUR AND status = 4")
     List<Orders> existsOrdersWithStatus();
+
+    @Select("select ifnull(sum(amount), 0) from orders where DATE(checkout_time) = #{begin} and status = 5")
+    Double getTurnoverList(LocalDate begin);
 }
