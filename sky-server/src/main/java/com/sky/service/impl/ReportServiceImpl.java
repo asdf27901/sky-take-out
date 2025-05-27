@@ -51,7 +51,7 @@ public class ReportServiceImpl implements ReportService {
         while (begin.isBefore(end) || begin.equals(end)) {
             dateList.add(begin.toString());
             totalUserList.add(userMapper.countTotalUserByDate(begin).toString());
-            newUserList.add(userMapper.countNewUserByDate(begin));
+            newUserList.add(userMapper.countNewUserByDate(begin).toString());
             begin = begin.plusDays(1);
         }
         return UserReportVO.builder()
