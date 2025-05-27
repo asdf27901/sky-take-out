@@ -3,6 +3,7 @@ package com.sky.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sky.constant.RedisConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.*;
 import com.sky.entity.*;
@@ -23,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.config.StateMachineFactory;
 import org.springframework.statemachine.support.DefaultStateMachineContext;
@@ -73,6 +75,9 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private WebSocketServer webSocketServer;
 
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+
     @Override
     @Transactional
     public OrderSubmitVO submit(OrdersSubmitDTO ordersSubmitDTO) {
@@ -94,6 +99,11 @@ public class OrderServiceImpl implements OrderService {
         Double distance = distanceUtil.getDistance(address.detailedAddress());
         if (distance > limitDistance) {
             throw new OrderBusinessException("下单失败，超出配送范围");
+        }
+
+        Integer shopStatus = (Integer) redisTemplate.opsForValue().get(RedisConstant.SHOP_STATUS_KEY);
+        if (shopStatus != null && shopStatus == 0){
+            throw new OrderBusinessException("下单失败，店铺不在营业中");
         }
 
         // 创建订单对象
