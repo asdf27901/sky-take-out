@@ -141,4 +141,30 @@
         GROUP BY dr.dt
         ORDER BY dr.dt;
     </select>
+
+    <select id="getOrdersStatistics" resultType="com.sky.service.impl.ReportServiceImpl$OrderDate">
+        WITH RECURSIVE date_range AS (
+            SELECT DATE(#{begin}) AS dt
+            UNION ALL
+            SELECT DATE_ADD(dt, INTERVAL 1 DAY)
+            FROM date_range
+            WHERE dt &lt;= #{end}
+        )
+        SELECT
+            dr.dt AS date,
+            (
+                select
+                count(1)
+                from orders o
+                where DATE(o.order_time) = dr.dt
+            ) AS daily_new_orders,
+            (
+                select
+                count(1)
+                from orders o
+                where DATE(o.order_time) = dr.dt and o.status = 5
+            ) AS daily_effective_new_orders
+        FROM date_range dr
+        ORDER BY dr.dt;
+    </select>
 </mapper>

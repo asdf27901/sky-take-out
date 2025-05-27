@@ -4,12 +4,15 @@ import com.sky.exception.BusinessException;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
+import com.sky.vo.OrderReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -71,6 +74,39 @@ public class ReportServiceImpl implements ReportService {
                 .build();
     }
 
+    @Override
+    public OrderReportVO getOrdersStatistics(LocalDate begin, LocalDate end) {
+        DateRange dateRange = checkDate(begin, end);
+        begin = dateRange.getBegin();
+        end = dateRange.getEnd();
+
+        StringJoiner dateList = new StringJoiner(",");
+        StringJoiner orderCountList = new StringJoiner(",");
+        StringJoiner validOrderCountList = new StringJoiner(",");
+        BigDecimal totalOrderCount = BigDecimal.ZERO;
+        BigDecimal validOrderCount = BigDecimal.ZERO;
+
+        List<OrderDate> orderDateList = orderMapper.getOrdersStatistics(begin, end);
+        for (OrderDate orderDate : orderDateList) {
+            totalOrderCount = totalOrderCount.add(new BigDecimal(orderDate.dailyNewOrders));
+            validOrderCount = validOrderCount.add(new BigDecimal(orderDate.dailyEffectiveNewOrders));
+            dateList.add(orderDate.date.toString());
+            orderCountList.add(orderDate.dailyNewOrders.toString());
+            validOrderCountList.add(orderDate.dailyEffectiveNewOrders.toString());
+        }
+        // 保留4位小数，四舍五入
+        // 使用BigDecimal计算避免出现精度丢失的情况
+        BigDecimal orderCompletionRate = validOrderCount.divide(totalOrderCount, 4, RoundingMode.HALF_UP);
+        return OrderReportVO.builder()
+                .dateList(dateList.toString())
+                .totalOrderCount(totalOrderCount.intValue())
+                .validOrderCount(validOrderCount.intValue())
+                .orderCompletionRate(orderCompletionRate.doubleValue())
+                .orderCountList(orderCountList.toString())
+                .validOrderCountList(validOrderCountList.toString())
+                .build();
+    }
+
     private DateRange checkDate(LocalDate begin, LocalDate end) {
         if (begin == null && end == null) {
             throw new BusinessException("范围过大，请限定时间范围");
@@ -109,6 +145,13 @@ public class ReportServiceImpl implements ReportService {
         private LocalDate date;
         private Integer dailyNewUsers;
         private Integer cumulativeUsers;
+    }
+
+    @Data
+    public static class OrderDate {
+        private LocalDate date;
+        private Integer dailyNewOrders;
+        private Integer dailyEffectiveNewOrders;
     }
 }
 

@@ -59,4 +59,6 @@ public interface OrderMapper {
 
 //    @Select("select ifnull(sum(amount), 0) from orders where DATE(checkout_time) = #{begin} and status = 5")
     List<ReportServiceImpl.TurnoverDate> getTurnoverList(LocalDate begin, LocalDate end);
+
+    List<ReportServiceImpl.OrderDate> getOrdersStatistics(LocalDate begin, LocalDate end);
 }
