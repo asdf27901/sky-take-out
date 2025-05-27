@@ -3,6 +3,7 @@ package com.sky.mapper;
 import com.github.pagehelper.Page;
 import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.entity.Orders;
+import com.sky.service.impl.ReportServiceImpl;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderVO;
 import org.apache.ibatis.annotations.Insert;
@@ -56,6 +57,6 @@ public interface OrderMapper {
     @Select("SELECT * FROM orders WHERE order_time <= NOW() - INTERVAL 1 HOUR AND status = 4")
     List<Orders> existsOrdersWithStatus();
 
-    @Select("select ifnull(sum(amount), 0) from orders where DATE(checkout_time) = #{begin} and status = 5")
-    Double getTurnoverList(LocalDate begin);
+//    @Select("select ifnull(sum(amount), 0) from orders where DATE(checkout_time) = #{begin} and status = 5")
+    List<ReportServiceImpl.TurnoverDate> getTurnoverList(LocalDate begin, LocalDate end);
 }

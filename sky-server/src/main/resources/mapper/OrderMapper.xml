@@ -91,7 +91,6 @@
         order by o.order_time desc
     </select>
 
-
     <update id="updateOrderBatch">
         <foreach collection="orders" item="order" separator=";">
             update orders
@@ -124,4 +123,22 @@
             where id = #{order.id}
         </foreach>
     </update>
+
+
+    <select id="getTurnoverList" resultType="com.sky.service.impl.ReportServiceImpl$TurnoverDate">
+        WITH RECURSIVE date_range AS (
+            SELECT DATE(#{begin}) AS dt
+            UNION ALL
+            SELECT DATE_ADD(dt, INTERVAL 1 DAY)
+            FROM date_range
+            WHERE dt &lt;= #{end}
+        )
+        SELECT
+            dr.dt AS date,
+            COALESCE(SUM(o.amount), 0) AS total_amount
+        FROM date_range dr
+            LEFT JOIN orders o ON DATE(o.checkout_time) = dr.dt and o.status = 5
+        GROUP BY dr.dt
+        ORDER BY dr.dt;
+    </select>
 </mapper>

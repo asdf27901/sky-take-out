@@ -1,12 +1,14 @@
 package com.sky.mapper;
 
 import com.sky.entity.User;
+import com.sky.service.impl.ReportServiceImpl;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Mapper
 public interface UserMapper {
@@ -19,9 +21,5 @@ public interface UserMapper {
     @Options(useGeneratedKeys = true, keyProperty = "id")
     void saveUser(User user);
 
-    @Select("select * from user where DATE(create_time) <= #{begin}")
-    Integer countTotalUserByDate(LocalDate begin);
-
-    @Select("select count(1) from user where DATE(create_time) = #{begin}")
-    CharSequence countNewUserByDate(LocalDate begin);
+    List<ReportServiceImpl.UserDate> getUserStatistics(LocalDate begin, LocalDate end);
 }
