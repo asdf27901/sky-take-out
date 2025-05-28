@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.entity.Orders;
 import com.sky.service.impl.ReportServiceImpl;
+import com.sky.vo.OrderOverViewVO;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderVO;
 import org.apache.ibatis.annotations.Insert;
@@ -65,4 +66,6 @@ public interface OrderMapper {
     List<ReportServiceImpl.SalesTop10> getSaleDishTop10(LocalDate begin, LocalDate end);
 
     List<ReportServiceImpl.SalesTop10> getSaleSetMealTop10(LocalDate begin, LocalDate end);
+
+    OrderOverViewVO getAllStatusOrderCount();
 }

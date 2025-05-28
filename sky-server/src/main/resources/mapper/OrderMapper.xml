@@ -191,4 +191,13 @@
         group by s.id, s.name
         order by count desc limit 10
     </select>
+
+    <select id="getAllStatusOrderCount" resultType="com.sky.vo.OrderOverViewVO">
+        select
+            (select count(1) from orders where status = 2 and DATE(order_time) = CURRENT_DATE) as waiting_orders,
+            (select count(1) from orders where status = 3 and DATE(order_time) = CURRENT_DATE) as delivered_orders,
+            (select count(1) from orders where status = 5 and DATE(order_time) = CURRENT_DATE) as completed_orders,
+            (select count(1) from orders where status = 6 and DATE(order_time) = CURRENT_DATE) as cancelled_orders,
+            (select count(1) from orders where DATE(order_time) = CURRENT_DATE) as all_orders;
+    </select>
 </mapper>
