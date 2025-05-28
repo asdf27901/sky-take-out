@@ -205,7 +205,7 @@
         select
             o.turnover,
             o.valid_order_count,
-            ifnull(round(o.valid_order_count / nullif((select count(1) from orders where DATE(order_time) = CURRENT_DATE), 0), 2), 0) * 100 as order_completion_rate,
+            ifnull(round(o.valid_order_count / nullif((select count(1) from orders where DATE(order_time) = CURRENT_DATE), 0), 2), 0) as order_completion_rate,
             ifnull(round(o.turnover / nullif(o.valid_order_count, 0), 2), 0) as unit_price,
             (select count(1) from user where DATE(create_time) = CURRENT_DATE) as new_users
         from
