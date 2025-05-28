@@ -127,4 +127,10 @@
         where d.category_id = #{categoryId} and d.status = 1
         order by d.create_time
     </select>
+
+    <select id="getAllStatusDishesCount" resultType="com.sky.vo.DishOverViewVO">
+        select
+            (select count(1) from dish where status = 1) as sold,
+            (select count(1) from dish where status = 0) as discontinued
+    </select>
 </mapper>

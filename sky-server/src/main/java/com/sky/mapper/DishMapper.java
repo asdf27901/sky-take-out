@@ -5,6 +5,7 @@ import com.sky.annotation.AutoSet;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.enumeration.OperationType;
+import com.sky.vo.DishOverViewVO;
 import com.sky.vo.DishVO;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
@@ -49,4 +50,6 @@ public interface DishMapper {
     List<String> getDishImagesByIds(List<Long> ids);
 
     List<DishVO> getDishVoListByCategoryId(Long categoryId);
+
+    DishOverViewVO getAllStatusDishesCount();
 }
