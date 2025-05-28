@@ -70,5 +70,5 @@ public interface OrderMapper {
 
     OrderOverViewVO getAllStatusOrderCount();
 
-    BusinessDataVO getBusinessData();
+    BusinessDataVO getBusinessData(LocalDate begin, LocalDate end);
 }

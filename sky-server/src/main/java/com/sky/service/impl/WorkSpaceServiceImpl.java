@@ -41,6 +41,6 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
 
     @Override
     public BusinessDataVO getBusinessData() {
-        return orderMapper.getBusinessData();
+        return orderMapper.getBusinessData(null, null);
     }
 }

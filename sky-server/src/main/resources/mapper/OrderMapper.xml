@@ -200,21 +200,51 @@
             (select count(1) from orders where status = 6 and DATE(order_time) = CURRENT_DATE) as cancelled_orders,
             (select count(1) from orders where DATE(order_time) = CURRENT_DATE) as all_orders;
     </select>
-    
+
+    <sql id="orderDateCondition">
+        <if test="begin == null or end == null">
+            DATE(checkout_time) = CURRENT_DATE
+        </if>
+        <if test="begin != null and end != null">
+            DATE(checkout_time) &gt;= #{begin} and DATE(checkout_time) &lt;= #{end}
+        </if>
+    </sql>
+
+    <sql id="userDateCondition">
+        <if test="begin == null or end == null">
+            DATE(create_time) = CURRENT_DATE
+        </if>
+        <if test="begin != null and end != null">
+            DATE(create_time) &gt;= #{begin} and DATE(create_time) &lt;= #{end}
+        </if>
+    </sql>
+
     <select id="getBusinessData" resultType="com.sky.vo.BusinessDataVO">
         select
             round(o.turnover, 2) as turnover,
             o.valid_order_count,
-            ifnull(round(o.valid_order_count / nullif((select count(1) from orders where DATE(order_time) = CURRENT_DATE), 0), 2), 0) as order_completion_rate,
+            ifnull(
+                round(
+                    o.valid_order_count / nullif(
+                        (
+                            select count(1) from orders where
+                            <include refid="orderDateCondition"/>
+                        ), 0)
+                    ,2)
+            , 0) as order_completion_rate,
             ifnull(round(o.turnover / nullif(o.valid_order_count, 0), 2), 0) as unit_price,
-            (select count(1) from user where DATE(create_time) = CURRENT_DATE) as new_users
+            (
+                select count(1) from user where
+                <include refid="userDateCondition"/>
+            ) as new_users
         from
         (
             select
                 sum(amount) as turnover,
                 count(1) as valid_order_count
              from orders
-             where status = 5 and DATE(checkout_time) = CURRENT_DATE
+             where status = 5
+            <include refid="orderDateCondition"/>
         ) o
     </select>
 </mapper>
