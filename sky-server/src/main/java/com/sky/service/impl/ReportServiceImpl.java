@@ -4,14 +4,18 @@ import com.sky.exception.BusinessException;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
-import com.sky.vo.OrderReportVO;
-import com.sky.vo.SalesTop10ReportVO;
-import com.sky.vo.TurnoverReportVO;
-import com.sky.vo.UserReportVO;
+import com.sky.vo.*;
+import lombok.Cleanup;
 import lombok.Data;
+import lombok.SneakyThrows;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -142,6 +146,47 @@ public class ReportServiceImpl implements ReportService {
                 .nameList(nameList.toString())
                 .numberList(numberList.toString())
                 .build();
+    }
+
+    @Override
+    @SneakyThrows
+    public void exportExcel(HttpServletResponse httpServletResponse) {
+        LocalDate begin = LocalDate.now().minusDays(30);
+        LocalDate end = LocalDate.now().minusDays(1);
+        BusinessDataVO businessData = orderMapper.getBusinessData(begin, end);
+
+        @Cleanup InputStream in = this.getClass().getResourceAsStream("template/运营数据报表模板.xlsx");
+        if (in == null) {
+            throw new BusinessException("模版文件不存在");
+        }
+        @Cleanup XSSFWorkbook workbook = new XSSFWorkbook(in);
+        XSSFSheet sheet = workbook.getSheet("Sheet1");
+        sheet.getRow(1).getCell(1).setCellValue("时间" + begin + "~" + end);
+        sheet.getRow(3).getCell(2).setCellValue(businessData.getTurnover());
+        sheet.getRow(3).getCell(5).setCellValue(businessData.getOrderCompletionRate());
+        sheet.getRow(3).getCell(7).setCellValue(businessData.getNewUsers());
+        sheet.getRow(4).getCell(2).setCellValue(businessData.getValidOrderCount());
+        sheet.getRow(4).getCell(5).setCellValue(businessData.getUnitPrice());
+
+        // 获取每天的BusinessDataVO
+        List<BusinessDataVO> businessDataVOList = orderMapper.getBusinessDataList(begin, end);
+        for (int i = 0; i < businessDataVOList.size(); i++) {
+            // 设置日期
+            sheet.getRow(7 + i).getCell(1).setCellValue(begin.plusDays(i).toString());
+            // 设置营业额
+            sheet.getRow(7 + i).getCell(2).setCellValue(businessDataVOList.get(i).getTurnover());
+            // 设置有效订单
+            sheet.getRow(7 + i).getCell(3).setCellValue(businessDataVOList.get(i).getValidOrderCount());
+            // 设置订单完成率
+            sheet.getRow(7 + i).getCell(4).setCellValue(businessDataVOList.get(i).getOrderCompletionRate());
+            // 设置平均客单价
+            sheet.getRow(7 + i).getCell(5).setCellValue(businessDataVOList.get(i).getUnitPrice());
+            // 设置新增用户数
+            sheet.getRow(7 + i).getCell(6).setCellValue(businessDataVOList.get(i).getNewUsers());
+        }
+
+        @Cleanup ServletOutputStream outputStream = httpServletResponse.getOutputStream();
+        workbook.write(outputStream);
     }
 
     private DateRange checkDate(LocalDate begin, LocalDate end) {

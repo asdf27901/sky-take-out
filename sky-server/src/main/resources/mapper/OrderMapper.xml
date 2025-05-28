@@ -247,4 +247,30 @@
             <include refid="orderDateCondition"/>
         ) o
     </select>
+
+    <select id="getBusinessDataList" resultType="com.sky.vo.BusinessDataVO">
+        WITH RECURSIVE date_range AS (
+            SELECT DATE(#{begin}) AS dt
+            UNION ALL
+            SELECT DATE_ADD(dt, INTERVAL 1 DAY)
+            FROM date_range
+            WHERE dt &lt; #{end}
+        )
+        select
+            o.date as date,
+            round(o.turnover, 2) as turnover,
+            o.valid_order_count,
+            ifnull(round(o.valid_order_count / nullif((select count(1) from orders where DATE(order_time) = o.date), 0), 2), 0) as order_completion_rate,
+            ifnull(round(o.turnover / nullif(o.valid_order_count, 0), 2), 0) as unit_price,
+            (select count(1) from user where DATE(create_time) = o.date) as new_users
+        from
+        (
+            select
+                dr.dt as date,
+                ifnull(sum(amount), 0) as turnover,
+                count(o.id) as valid_order_count
+            from date_range dr left join orders o on DATE(o.order_time) = dr.dt and status = 5
+            group by dr.dt
+        ) o
+    </select>
 </mapper>
