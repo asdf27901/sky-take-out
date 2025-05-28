@@ -200,4 +200,21 @@
             (select count(1) from orders where status = 6 and DATE(order_time) = CURRENT_DATE) as cancelled_orders,
             (select count(1) from orders where DATE(order_time) = CURRENT_DATE) as all_orders;
     </select>
+    
+    <select id="getBusinessData" resultType="com.sky.vo.BusinessDataVO">
+        select
+            o.turnover,
+            o.valid_order_count,
+            ifnull(round(o.valid_order_count / nullif((select count(1) from orders where DATE(order_time) = CURRENT_DATE), 0), 2), 0) * 100 as order_completion_rate,
+            ifnull(round(o.turnover / nullif(o.valid_order_count, 0), 2), 0) as unit_price,
+            (select count(1) from user where DATE(create_time) = CURRENT_DATE) as new_users
+        from
+        (
+            select
+                sum(amount) as turnover,
+                count(1) as valid_order_count
+             from orders
+             where status = 5 and DATE(checkout_time) = CURRENT_DATE
+        ) o
+    </select>
 </mapper>

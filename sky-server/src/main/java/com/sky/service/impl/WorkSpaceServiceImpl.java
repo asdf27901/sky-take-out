@@ -4,6 +4,7 @@ import com.sky.mapper.DishMapper;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.SetMealMapper;
 import com.sky.service.WorkSpaceService;
+import com.sky.vo.BusinessDataVO;
 import com.sky.vo.DishOverViewVO;
 import com.sky.vo.OrderOverViewVO;
 import com.sky.vo.SetmealOverViewVO;
@@ -36,5 +37,10 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
     @Override
     public SetmealOverViewVO getOverviewSetmeals() {
         return setMealMapper.getAllStatusSetMealCount();
+    }
+
+    @Override
+    public BusinessDataVO getBusinessData() {
+        return orderMapper.getBusinessData();
     }
 }
