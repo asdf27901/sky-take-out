@@ -107,4 +107,10 @@
             #{id}
         </foreach>
     </select>
+
+    <select id="getAllStatusSetMealCount" resultType="com.sky.vo.SetmealOverViewVO">
+        select
+            (select count(1) from setmeal where status = 1) as sold,
+            (select count(1) from setmeal where status = 0) as discontinued
+    </select>
 </mapper>

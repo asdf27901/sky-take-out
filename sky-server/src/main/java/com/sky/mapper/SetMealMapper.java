@@ -5,6 +5,7 @@ import com.sky.annotation.AutoSet;
 import com.sky.dto.SetmealPageQueryDTO;
 import com.sky.entity.Setmeal;
 import com.sky.enumeration.OperationType;
+import com.sky.vo.SetmealOverViewVO;
 import com.sky.vo.SetmealVO;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
@@ -44,4 +45,6 @@ public interface SetMealMapper {
 
     @Select("select * from setmeal where status = 1 and category_id = #{categoryId}")
     List<Setmeal> getSetMealListByCategoryId(Long categoryId);
+
+    SetmealOverViewVO getAllStatusSetMealCount();
 }
