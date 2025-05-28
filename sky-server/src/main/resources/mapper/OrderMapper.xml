@@ -203,7 +203,7 @@
     
     <select id="getBusinessData" resultType="com.sky.vo.BusinessDataVO">
         select
-            round(o.turnover, 2),
+            round(o.turnover, 2) as turnover,
             o.valid_order_count,
             ifnull(round(o.valid_order_count / nullif((select count(1) from orders where DATE(order_time) = CURRENT_DATE), 0), 2), 0) as order_completion_rate,
             ifnull(round(o.turnover / nullif(o.valid_order_count, 0), 2), 0) as unit_price,
