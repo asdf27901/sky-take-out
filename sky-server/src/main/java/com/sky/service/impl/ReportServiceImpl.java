@@ -163,10 +163,10 @@ public class ReportServiceImpl implements ReportService {
         XSSFSheet sheet = workbook.getSheet("Sheet1");
         sheet.getRow(1).getCell(1).setCellValue("时间" + begin + "~" + end);
         sheet.getRow(3).getCell(2).setCellValue(businessData.getTurnover());
-        sheet.getRow(3).getCell(5).setCellValue(businessData.getOrderCompletionRate());
-        sheet.getRow(3).getCell(7).setCellValue(businessData.getNewUsers());
+        sheet.getRow(3).getCell(4).setCellValue(businessData.getOrderCompletionRate());
+        sheet.getRow(3).getCell(6).setCellValue(businessData.getNewUsers());
         sheet.getRow(4).getCell(2).setCellValue(businessData.getValidOrderCount());
-        sheet.getRow(4).getCell(5).setCellValue(businessData.getUnitPrice());
+        sheet.getRow(4).getCell(4).setCellValue(businessData.getUnitPrice());
 
         // 获取每天的BusinessDataVO
         List<BusinessDataVO> businessDataVOList = orderMapper.getBusinessDataList(begin, end);
