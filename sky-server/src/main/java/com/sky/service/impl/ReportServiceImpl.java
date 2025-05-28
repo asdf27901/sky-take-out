@@ -155,7 +155,7 @@ public class ReportServiceImpl implements ReportService {
         LocalDate end = LocalDate.now().minusDays(1);
         BusinessDataVO businessData = orderMapper.getBusinessData(begin, end);
 
-        @Cleanup InputStream in = this.getClass().getResourceAsStream("template/运营数据报表模板.xlsx");
+        @Cleanup InputStream in = this.getClass().getClassLoader().getResourceAsStream("template/运营数据报表模板.xlsx");
         if (in == null) {
             throw new BusinessException("模版文件不存在");
         }
