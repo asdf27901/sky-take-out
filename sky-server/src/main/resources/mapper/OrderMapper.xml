@@ -240,7 +240,7 @@
         from
         (
             select
-                sum(amount) as turnover,
+                ifnull(sum(amount), 0) as turnover,
                 count(1) as valid_order_count
              from orders
              where status = 5 and
